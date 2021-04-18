@@ -15,6 +15,7 @@ class ImageClassifier(object):
             self._load(config["checkpoint"])
         self.curr_epoch = config["curr_epoch"]
         self.name = "{}-{}-{}-{}".format(config["name"], config["resolution"], config["batch_size"], config["lr"])
+        self.bs = config["batch_size"]
         
     def _create_model(self, library, name, pretrained, num_classes):
         if library == "timm":
