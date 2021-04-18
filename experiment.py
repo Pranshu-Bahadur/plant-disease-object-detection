@@ -8,9 +8,7 @@ import PIL
 
 class Experiment(object):
     def __init__(self, config: dict):
-        self.classifier = ImageClassifier(config["model_config"])
-        #if config["train"]:
-            #self._run(config["dataset_directory"],config["experiment_config"])
+        self.classifier = ImageClassifier(config)
         
     #@TODO Add normalized weight computation, use weighted random sampler.
     def _run(self, dataset, config: dict):

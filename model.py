@@ -8,10 +8,10 @@ class ImageClassifier(object):
     def __init__(self, config : dict):
         self.model = nn.DataParallel(self._create_model(config["library"], config["name"], config["pretrained"], config["num_classes"])).cuda()
         if config["mode"] == "train":
-            self.optimizer = self._create_optimizer(config["optimizer_name"], self.model.parameters(), config["optimizer_config"])
+            self.optimizer = self._create_optimizer(config["optimizer_name"], self.model.parameters(), config["learning_rate"])
             self.scheduler = self._create_scheduler(config["scheduler_name"], self.optimizer)
             self.criterion = self._create_criterion(config["criterion_name"])
-        if config["checkpoint"]:
+        if config["checkpoint"] != "":
             self._load(config["checkpoint"])
         self.curr_epoch = config["curr_epoch"]
         self.name = "{}-{}-{}-{}".format(config["name"], config["resolution"], config["batch_size"], config["lr"])
@@ -21,19 +21,16 @@ class ImageClassifier(object):
         if library == "timm":
             return timm.create_model(name, pretrained=pretrained, num_classes=num_classes)
 
-    def _create_optimizer(self, name, model_params, config: dict):
-        optim_dict = {"SGD":torch.optim.SGD(model_params),
+    def _create_optimizer(self, name, model_params, lr):
+        optim_dict = {"SGD":torch.optim.SGD(model_params, lr,weight_decay=2e-5, momentum=0.9, nesterov=True),
                       #"SAMSGD": SAMSGD(model_params)                  
         }
-        optimizer = optim_dict[name]
-        for _, (key, value) in enumerate(config):
-            optimizer.param_groups[0][key] = value
-        return optimizer
+        return optim_dict[name]
     
     def _create_scheduler(self, name, optimizer):
         scheduler_dict = {
             "StepLR": torch.optim.lr_scheduler.StepLR(optimizer, step_size=2.4, gamma=0.97),
-            "CosineAnnealing": torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, 15000)
+            "CosineAnnealing": torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, 2000)
         }
         return scheduler_dict[name]
 
@@ -72,7 +69,7 @@ class ImageClassifier(object):
             preds = self.model(x.cuda())
             loss = self.criterion(preds, y.cuda())
             probs = nn.functional.softmax(preds, 1)
-            y_ = torch.argmax(probs)
+            y_ = torch.argmax(probs, dim=1)
             correct += (y_.cpu()==y.cpu()).sum().item()
             total += y.size(0)
             if train:
