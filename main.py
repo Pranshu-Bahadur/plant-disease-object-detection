@@ -17,6 +17,8 @@ def _model_config(args):
         "resolution": int(args.resolution),
         "epochs": int(args.epochs) if args.epochs else 0,
         "train": True if args.train else False,
+        "pretrained": True if args.pretrained else False,
+        "save_interval": 10,
         "library": args.library,
         "save_directory": args.save_directory
     }
@@ -40,6 +42,7 @@ if __name__ == "main":
     parser.add_argument("--train", help="Set this model to train mode", action="store_true")
     parser.add_argument("--library")
     parser.add_argument("--save_directory", "-s")
+    parser.add_argument("pretrained", action="store_true")
     args = parser.parse_args()
     config = _model_config(args)
     experiment = Experiment(config)
