@@ -30,6 +30,7 @@ class Experiment(object):
         print("Run Complete.")
 
     def _preprocessing(self, directory, resolution, train):
+        """
         mean_sum = [0, 0, 0]
         transformations = [
         transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
@@ -48,11 +49,12 @@ class Experiment(object):
             std_sum += batch.std(2).sum(0)            
         mean_sum /= nimages
         std_sum  /= nimages
+        """
         transformations = [
-            transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
+            #transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
             RandAugment(),
             transforms.ToTensor(),
-            transforms.Normalize(mean=mean_sum, std=std_sum)
+            #transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
         transformations = transforms.Compose(transformations)
         dataSetFolder = torchvision.datasets.ImageFolder(root=directory, transform=transformations)
