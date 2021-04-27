@@ -10,9 +10,9 @@ class ImageClassifier(object):
     def __init__(self, config : dict):
         self.model = self._create_model(config["library"], config["model_name"], config["pretrained"], config["num_classes"])
         if config["train"]:
-            self.optimizer = self._create_optimizer(config["optimizer_name"], self.model.parameters(), config["learning_rate"])
+            self.optimizer = self._create_optimizer(config["optimizer_name"], self.model, config["learning_rate"])
             self.scheduler = self._create_scheduler(config["scheduler_name"], self.optimizer)
-            self.criterion = self._create_criterion(config["criterion_name"]).cuda()
+            self.criterion = self._create_criterion(config["criterion_name"])
         if config["checkpoint"] != "":
             self._load(config["checkpoint"])
         self.curr_epoch = config["curr_epoch"]
@@ -31,8 +31,8 @@ class ImageClassifier(object):
             return Net(num_classes)
 
     def _create_optimizer(self, name, model_params, lr):
-        optim_dict = {"SGD":torch.optim.SGD(model_params, lr,weight_decay=2e-5, momentum=0.9, nesterov=True),
-                      "SAMSGD": SAMSGD(model_params, lr, momentum=0.9,weight_decay=2e-5,nesterov=True)
+        optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=2e-5, momentum=0.9, nesterov=True),
+                      "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=2e-5,nesterov=True)
         }
         return optim_dict[name]
     
