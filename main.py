@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader as Loader
 
 def _model_config(args):
     config = {
-        "model_name": args.model,
+        "model_name": args.model_name,
         "batch_size": int(args.batch_size),
         "learning_rate": float(args.learning_rate),
         "optimizer_name": args.optimizer,
