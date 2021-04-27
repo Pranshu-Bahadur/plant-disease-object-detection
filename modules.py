@@ -47,8 +47,8 @@ class MultiKernelDepthWiseConvolution(nn.Module):
         """
         self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 3, stride, 1)))
         self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 5, stride, 1)))
-        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 7, stride, 1)))
-        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 9, stride, 1)))
+        #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 7, stride, 1)))
+        #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 9, stride, 1)))
         #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 2, 1, 1), MemoryEfficientSwish()))
         #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 2, 1, 1), MemoryEfficientSwish()))
 
@@ -93,7 +93,7 @@ class MBConv(nn.Module):
         else:
             self.expansionLayer = nn.Identity()
 
-        self.depthWiseLayer =  MultiKernelDepthWiseConvolution(inChannels, expansionFactor, 4, stride) if not self.skip else DepthWiseConvolution(inChannels,kernelSize,stride, expansionFactor)
+        self.depthWiseLayer =  MultiKernelDepthWiseConvolution(inChannels, expansionFactor, 2, stride) if not self.skip else DepthWiseConvolution(inChannels,kernelSize,stride, expansionFactor)
         self.b = BatchNormalization2D(inChannels*expansionFactor)
         self.sw = MemoryEfficientSwish()
         self.squeezeAndExcitationLayer = SqueezeAndExcitation(inChannels*expansionFactor, reductionDimension)
