@@ -47,7 +47,7 @@ class MultiKernelDepthWiseConvolution(nn.Module):
         """
         self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 3, stride, 1)))
         self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 5, stride, 1)))
-        #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 7, stride, 1)))
+        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 7, stride, 1)))
         #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 9, stride, 1)))
         #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 2, 1, 1), MemoryEfficientSwish()))
         #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 2, 1, 1), MemoryEfficientSwish()))
@@ -93,7 +93,7 @@ class MBConv(nn.Module):
         else:
             self.expansionLayer = nn.Identity()
 
-        self.depthWiseLayer =  MultiKernelDepthWiseConvolution(inChannels, expansionFactor, 2, stride) if not self.skip else DepthWiseConvolution(inChannels,kernelSize,stride, expansionFactor)
+        self.depthWiseLayer =  MultiKernelDepthWiseConvolution(inChannels, expansionFactor, 3, stride) if not self.skip else DepthWiseConvolution(inChannels,kernelSize,stride, expansionFactor)
         self.b = BatchNormalization2D(inChannels*expansionFactor)
         self.sw = MemoryEfficientSwish()
         self.squeezeAndExcitationLayer = SqueezeAndExcitation(inChannels*expansionFactor, reductionDimension)
@@ -187,18 +187,18 @@ class Net(nn.Module):
         self.head = nn.Conv2d(in_channels=3,out_channels=64,kernel_size=3, stride=1)
         self.swish = MemoryEfficientSwish()
         self.bn = BatchNormalization2D(64)
-        self.channels = [64, 128]
+        self.channels = [64, 128, 256]
         self.stages = nn.ModuleList([nn.Sequential(
         MBConv(n, n*2, 1, 2, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
         MBConv(n*2, n*2, 2, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
         MBConv(n*2, n*2, 2, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
-        MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
-        MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
-        MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
-        MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
-        MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
-        MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
-        MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
+        MBConv(n*2, n*2, 2, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
+        MBConv(n*2, n*2, 2, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
+        #MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
+        #MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
+        #MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
+        #MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
+        #MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
         ) for n in self.channels])
         self.gap = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Linear(self.channels[-1]*2, nc)
