@@ -8,7 +8,7 @@ from sam import SAMSGD
 
 class ImageClassifier(object):
     def __init__(self, config : dict):
-        self.model = nn.DataParallel(self._create_model(config["library"], config["name"], config["pretrained"], config["num_classes"])).cuda()
+        self.model = nn.DataParallel(self._create_model(config["library"], config["model_name"], config["pretrained"], config["num_classes"])).cuda()
         if config["mode"] == "train":
             self.optimizer = self._create_optimizer(config["optimizer_name"], self.model.parameters(), config["learning_rate"])
             self.scheduler = self._create_scheduler(config["scheduler_name"], self.optimizer)
