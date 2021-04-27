@@ -36,7 +36,6 @@ class ImageFilelist(data.Dataset):
 			img = self.transform(img)
 		if self.target_transform is not None:
 			target = self.target_transform(target)
-		#img = img[:,24:200, 24:200]
 		return img, target
 
 	def __len__(self):
@@ -75,7 +74,6 @@ class ImageFilelistWithLabels(data.Dataset):
 			img = self.transform(img)
 		if self.target_transform is not None:
 			target = self.target_transform(target)
-		#img = img[:,24:200, 24:200]
 		return img, target
 
 	def __len__(self):

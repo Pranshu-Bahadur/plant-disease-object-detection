@@ -1,6 +1,7 @@
 import torch
 import argparse
 from experiment import Experiment
+from torch.utils.data import DataLoader as Loader
 
 
 def _model_config(args):
@@ -48,4 +49,8 @@ if __name__ == "main":
     experiment = Experiment(config)
     if args.train:
         experiment._run(args.dataset_directory, config)
+    else:
+        dataset = experiment._preprocessing(args.dataset_directory, config["resolution"], False)
+        loader = Loader(dataset, experiment.classifier.bs, shuffle=False, num_workers=4)
+        experiment.classifier._test(loader)
 

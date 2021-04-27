@@ -17,7 +17,13 @@ class Experiment(object):
         while (self.classifier.curr_epoch < init_epoch + config["epochs"]):
             loaders = [Loader(ds, self.classifier.bs, shuffle=True, num_workers=4) for ds in split]
             train_acc, train_loss, val_acc, val_loss = self.classifier._run_epoch(loaders)
+
             print("Epoch: {} | Training Accuracy: {} | Training Loss: {} | Validation Accuracy: {} | Validation Loss: {}".format(self.classifier.curr_epoch, train_acc, train_loss, val_acc, val_loss))
+            self.classifier.writer.add_scalar("Training Accuracy", train_acc, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("Validation Accuracy",val_acc, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("Training Loss",train_loss, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("Validation Loss",val_loss, self.classifier.curr_epoch)
+
             if self.classifier.curr_epoch%config["save_interval"]==0:
                 self.classifier._save(config["save_directory"], self.classifier.name+"-"+self.classifier.curr_epoch)
             self.classifier.curr_epoch += 1
@@ -44,11 +50,7 @@ class Experiment(object):
         std_sum  /= nimages
         transformations = [
             transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
-            #transforms.RandomHorizontalFlip(),
             RandAugment(),
-            RandAugment(),
-            #RandAugment(),
-            #RandAugment(),
             transforms.ToTensor(),
             transforms.Normalize(mean=mean_sum, std=std_sum)
         ]

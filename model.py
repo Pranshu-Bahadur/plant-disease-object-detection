@@ -3,6 +3,8 @@ from torch import functional as F
 from torch import nn as nn
 from torch.utils.tensorboard import SummaryWriter
 import timm
+from modules import Net
+from sam import SAMSGD
 
 class ImageClassifier(object):
     def __init__(self, config : dict):
@@ -16,21 +18,27 @@ class ImageClassifier(object):
         self.curr_epoch = config["curr_epoch"]
         self.name = "{}-{}-{}-{}".format(config["name"], config["resolution"], config["batch_size"], config["lr"])
         self.bs = config["batch_size"]
+        self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
+        self.writer.flush()
+        print("Generated model: {}".format(self.name))
+
         
     def _create_model(self, library, name, pretrained, num_classes):
         if library == "timm":
             return timm.create_model(name, pretrained=pretrained, num_classes=num_classes)
+        else:
+            return Net(num_classes)
 
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params, lr,weight_decay=2e-5, momentum=0.9, nesterov=True),
-                      #"SAMSGD": SAMSGD(model_params)                  
+                      "SAMSGD": SAMSGD(model_params, lr, momentum=0.9,weight_decay=2e-5,nesterov=True)
         }
         return optim_dict[name]
     
     def _create_scheduler(self, name, optimizer):
         scheduler_dict = {
             "StepLR": torch.optim.lr_scheduler.StepLR(optimizer, step_size=2.4, gamma=0.97),
-            "CosineAnnealing": torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, 2000)
+            "CosineAnnealing": torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, 50, 2)
         }
         return scheduler_dict[name]
 
@@ -73,8 +81,18 @@ class ImageClassifier(object):
             correct += (y_.cpu()==y.cpu()).sum().item()
             total += y.size(0)
             if train:
-                loss.backward()
-                self.optimizer.step()
+                if type(self.optimizer) == SAMSGD:
+                    def closure():
+                        self.optimizer.zero_grad()
+                        outputs = self.model(x.cuda())
+                        loss = self.criterion(outputs, y.cuda())
+                        loss.backward()
+                        return loss
+                    self.optimizer.step(closure)
+                else:   
+                    loss.backward()
+                    self.optimizer.step()
+                self.scheduler.step()
             print(idx, (correct/total)*100, loss.cpu().item())
             running_loss += loss.cpu().item()
             iterations += 1
