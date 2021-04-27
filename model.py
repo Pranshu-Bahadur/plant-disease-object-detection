@@ -8,11 +8,11 @@ from sam import SAMSGD
 
 class ImageClassifier(object):
     def __init__(self, config : dict):
-        self.model = nn.DataParallel(self._create_model(config["library"], config["model_name"], config["pretrained"], config["num_classes"])).cuda()
+        self.model = self._create_model(config["library"], config["model_name"], config["pretrained"], config["num_classes"])
         if config["train"]:
             self.optimizer = self._create_optimizer(config["optimizer_name"], self.model.parameters(), config["learning_rate"])
             self.scheduler = self._create_scheduler(config["scheduler_name"], self.optimizer)
-            self.criterion = self._create_criterion(config["criterion_name"])
+            self.criterion = self._create_criterion(config["criterion_name"]).cuda()
         if config["checkpoint"] != "":
             self._load(config["checkpoint"])
         self.curr_epoch = config["curr_epoch"]
@@ -21,6 +21,7 @@ class ImageClassifier(object):
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
         print("Generated model: {}".format(self.name))
+        self.model = nn.DataParallel(self.model).cuda()
 
         
     def _create_model(self, library, name, pretrained, num_classes):
