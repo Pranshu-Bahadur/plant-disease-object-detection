@@ -52,7 +52,7 @@ class Experiment(object):
         """
         transformations = [
             #transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
-            RandAugment(),
+            #RandAugment(),
             transforms.ToTensor(),
             #transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
