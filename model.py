@@ -28,7 +28,7 @@ class ImageClassifier(object):
         if library == "timm":
             return timm.create_model(name, pretrained=pretrained, num_classes=num_classes)
         else:
-            return Net(num_classes)
+            return Net(num_classes, 0.1)
 
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=2e-5, momentum=0.9, nesterov=True),
@@ -63,7 +63,7 @@ class ImageClassifier(object):
         self.curr_epoch += 1
         self.model.train()
         train_acc, train_loss = self._train_or_eval(split[0], True)
-        self.model.eval()
+        #self.model.eval()
         with torch.no_grad():
             val_acc, val_loss = self._train_or_eval(split[1], False)
         print(train_acc, train_loss, val_acc, val_loss)
