@@ -14,6 +14,8 @@ class ImageClassifier(object):
         self.scheduler = self._create_scheduler(config["scheduler_name"], self.optimizer)
         self.criterion = self._create_criterion(config["criterion_name"])
         if config["checkpoint"] != "":
+            self.model = nn.DataParallel(self.model).cuda()
+
             self._load(config["checkpoint"])
         self.curr_epoch = config["curr_epoch"]
         self.name = "{}-{}-{}-{}".format(config["model_name"], config["resolution"], config["batch_size"], config["learning_rate"])
@@ -21,7 +23,8 @@ class ImageClassifier(object):
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
         print("Generated model: {}".format(self.name))
-        self.model = nn.DataParallel(self.model).cuda()
+        if config["train"]:
+           self.model = nn.DataParallel(self.model).cuda()
 
         
     def _create_model(self, library, name, pretrained, num_classes):
