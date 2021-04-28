@@ -94,7 +94,7 @@ class ImageClassifier(object):
                     loss.backward()
                     self.optimizer.step()
                 self.scheduler.step()
-            print(idx, (correct/total)*100, loss.cpu().item())
+                print(idx, (correct/total)*100, loss.cpu().item())
             running_loss += loss.cpu().item()
             iterations += 1
             del x, y

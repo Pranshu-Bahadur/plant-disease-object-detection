@@ -26,7 +26,6 @@ class Experiment(object):
 
             if self.classifier.curr_epoch%config["save_interval"]==0:
                 self.classifier._save(config["save_directory"], self.classifier.name+"-"+self.classifier.curr_epoch)
-            self.classifier.curr_epoch += 1
         print("Run Complete.")
 
     def _preprocessing(self, directory, resolution, train):
