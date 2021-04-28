@@ -25,7 +25,7 @@ class Experiment(object):
             self.classifier.writer.add_scalar("Validation Loss",val_loss, self.classifier.curr_epoch)
 
             if self.classifier.curr_epoch%config["save_interval"]==0:
-                self.classifier._save(config["save_directory"], self.classifier.name+"-"+self.classifier.curr_epoch)
+                self.classifier._save(config["save_directory"], "{}-{}".format(self.classifier.name, self.classifier.curr_epoch))
         print("Run Complete.")
 
     def _preprocessing(self, directory, resolution, train):
