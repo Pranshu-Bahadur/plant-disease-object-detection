@@ -102,7 +102,7 @@ class ImageClassifier(object):
         return float(correct/float(total))*100, float(running_loss/iterations)
 
     def _test(self, loader):
-        self.model.eval()
+        #self.model.eval()
         with torch.no_grad():
             test_acc, test_loss = self._train_or_eval(loader, False)
         print(test_acc, test_loss)
