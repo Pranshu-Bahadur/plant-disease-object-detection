@@ -9,10 +9,10 @@ from sam import SAMSGD
 class ImageClassifier(object):
     def __init__(self, config : dict):
         self.model = self._create_model(config["library"], config["model_name"], config["pretrained"], config["num_classes"])
-        if config["train"]:
-            self.optimizer = self._create_optimizer(config["optimizer_name"], self.model, config["learning_rate"])
-            self.scheduler = self._create_scheduler(config["scheduler_name"], self.optimizer)
-            self.criterion = self._create_criterion(config["criterion_name"])
+        #if config["train"]:
+        self.optimizer = self._create_optimizer(config["optimizer_name"], self.model, config["learning_rate"])
+        self.scheduler = self._create_scheduler(config["scheduler_name"], self.optimizer)
+        self.criterion = self._create_criterion(config["criterion_name"])
         if config["checkpoint"] != "":
             self._load(config["checkpoint"])
         self.curr_epoch = config["curr_epoch"]
