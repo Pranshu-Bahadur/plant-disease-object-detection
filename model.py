@@ -83,6 +83,7 @@ class ImageClassifier(object):
                 x = torchvision.transforms.RandomHorizontalFlip()(x)
                 x = torchvision.transforms.RandomResizedCrop(512, scale=(0.8, 1.0))(x)
                 x = torchvision.transforms.ColorJitter()(x)
+                loss = self.criterion(preds, y.cuda())
                 if type(self.optimizer) == SAMSGD:
                     def closure():
                         self.optimizer.zero_grad()
@@ -97,7 +98,6 @@ class ImageClassifier(object):
                 self.scheduler.step()
                 print(idx, (correct/total)*100, loss.cpu().item())
             preds = self.model(x.cuda())
-            loss = self.criterion(preds, y.cuda())
             probs = nn.functional.softmax(preds, 1)
             y_ = torch.argmax(probs, dim=1)
             correct += (y_.cpu()==y.cpu()).sum().item()
