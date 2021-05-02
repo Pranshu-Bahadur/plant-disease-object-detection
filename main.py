@@ -37,8 +37,8 @@ def _tbx11k_output(classifier, dataset: Loader):
             result = ""
             for _, data in enumerate(dataset):
                 x = data[0]
-                if classifier.cuda:
-                    x = x.cuda()
+                #if classifier.cuda:
+                x = x.cuda()
                 outputs = classifier.model(x)
                 probs = torch.nn.functional.softmax(outputs, dim=1)
                 for _, prob in enumerate(probs.detach().cpu().numpy()):
