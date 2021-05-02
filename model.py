@@ -78,6 +78,7 @@ class ImageClassifier(object):
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
+            total += y.size(0)
             if train:
                 x = torchvision.transforms.RandomHorizontalFlip()(x)
                 x = torchvision.transforms.RandomResizedCrop(512, scale=(0.8, 1.0))(x)
@@ -100,7 +101,6 @@ class ImageClassifier(object):
             probs = nn.functional.softmax(preds, 1)
             y_ = torch.argmax(probs, dim=1)
             correct += (y_.cpu()==y.cpu()).sum().item()
-            total += y.size(0)
             running_loss += loss.cpu().item()
             iterations += 1
             del x, y
