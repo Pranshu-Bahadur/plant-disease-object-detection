@@ -4,7 +4,7 @@ from experiment import Experiment
 from torch.utils.data import DataLoader as Loader
 from torchvision import transforms as transforms
 import PIL
-from utils import ImageFilelist
+from util import ImageFilelist
 
 
 def _model_config(args):
