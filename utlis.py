@@ -1,6 +1,4 @@
-
 import torch.utils.data as data
-
 from PIL import Image
 import os
 import os.path
@@ -15,7 +13,7 @@ def default_flist_reader(flist):
 	imlist = []
 	with open(flist, 'r') as rf:
 		for line in rf.readlines():
-			impath, imlabel = line.split(",")
+			impath, imlabel = line.split("\n")
 			imlist.append((impath, int(0 if imlabel=="Healthy\n" or imlabel=="normal\n" else 1)))#, int(1 if imlabel=="TB" else 0)) )
 					
 	return imlist

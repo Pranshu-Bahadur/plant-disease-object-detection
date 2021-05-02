@@ -2,6 +2,9 @@ import torch
 import argparse
 from experiment import Experiment
 from torch.utils.data import DataLoader as Loader
+from torchvision import transforms as transforms
+import PIL
+from utils import ImageFilelist
 
 
 def _model_config(args):
@@ -25,6 +28,26 @@ def _model_config(args):
     }
     return config
 
+
+
+def _tbx11k_output(classifier, dataset: Loader):
+    classifier.model.eval()
+    with torch.no_grad():
+        with open('outputs/{}-submission.txt'.format(classifier.name), "w+") as output:
+            result = ""
+            for _, data in enumerate(dataset):
+                x = data[0]
+                if classifier.cuda:
+                    x = x.cuda()
+                outputs = classifier.model(x)
+                probs = torch.nn.functional.softmax(outputs, dim=1)
+                for _, prob in enumerate(probs.detach().cpu().numpy()):
+                    print(' '.join(map(str, prob)))
+                    result += ' '.join(map(str, prob))
+                    result += "\n"
+            output.write(result)
+            output.close()
+
 if __name__ == "__main__":
     torch.backends.cudnn.enabled = True
     parser = argparse.ArgumentParser()
@@ -42,12 +65,24 @@ if __name__ == "__main__":
     parser.add_argument("--loss", help="Choose a loss criterion")
     parser.add_argument("--train", help="Set this model to train mode", action="store_true")
     parser.add_argument("--library")
+    parser.add_argument("--list")
     parser.add_argument("--save_directory", "-s")
-    parser.add_argument("pretrained", action="store_true")
+    parser.add_argument("--pretrained", action="store_true")
+    parser.add_argument("--opMode", action="store_true")
+
     args = parser.parse_args()
     config = _model_config(args)
     experiment = Experiment(config)
-    if args.train:
+    if args.opMode:
+        transformations = [
+            transforms.Resize([int(args.resolution), int(args.resolution)], PIL.Image.ANTIALIAS),
+            transforms.ToTensor(),
+        ]
+        transformations = transforms.Compose(transformations)
+        dataset = ImageFilelist(root=args.dataset_directory, flist=args.list, transform=transformations)#TBX11K(txt_path=args.list, img_dir=args.dataset, transform=transformations)
+        testLoader = Loader(dataset, batch_size=experiment.classifier.bs, num_workers=4, shuffle=False)
+        _tbx11k_output(experiment.classifier, testLoader)
+    elif args.train:
         experiment._run(args.dataset_directory, config)
     else:
         dataset = experiment._preprocessing(args.dataset_directory, config["resolution"], False)

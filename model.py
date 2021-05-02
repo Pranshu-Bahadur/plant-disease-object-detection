@@ -9,13 +9,12 @@ from sam import SAMSGD
 class ImageClassifier(object):
     def __init__(self, config : dict):
         self.model = self._create_model(config["library"], config["model_name"], config["pretrained"], config["num_classes"])
-        #if config["train"]:
-        self.optimizer = self._create_optimizer(config["optimizer_name"], self.model, config["learning_rate"])
-        self.scheduler = self._create_scheduler(config["scheduler_name"], self.optimizer)
-        self.criterion = self._create_criterion(config["criterion_name"])
+        if config["train"]:
+            self.optimizer = self._create_optimizer(config["optimizer_name"], self.model, config["learning_rate"])
+            self.scheduler = self._create_scheduler(config["scheduler_name"], self.optimizer)
+            self.criterion = self._create_criterion(config["criterion_name"])
         if config["checkpoint"] != "":
             self.model = nn.DataParallel(self.model).cuda()
-
             self._load(config["checkpoint"])
         self.curr_epoch = config["curr_epoch"]
         self.name = "{}-{}-{}-{}".format(config["model_name"], config["resolution"], config["batch_size"], config["learning_rate"])
@@ -23,7 +22,7 @@ class ImageClassifier(object):
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
         print("Generated model: {}".format(self.name))
-        if config["train"]:
+        if config["train"] and config["checkpoint"] == "":
            self.model = nn.DataParallel(self.model).cuda()
 
         
@@ -110,9 +109,6 @@ class ImageClassifier(object):
             test_acc, test_loss = self._train_or_eval(loader, False)
         print(test_acc, test_loss)
         return test_acc, test_loss
-
-    def _generate_heatmap_scorecam(self, x, y):
-        pass
 
     #@TODO
     def _add_detector(self):
