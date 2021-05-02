@@ -1,3 +1,4 @@
+import torchvision
 import torch
 from torch import functional as F
 from torch import nn as nn
@@ -77,13 +78,10 @@ class ImageClassifier(object):
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
-            preds = self.model(x.cuda())
-            loss = self.criterion(preds, y.cuda())
-            probs = nn.functional.softmax(preds, 1)
-            y_ = torch.argmax(probs, dim=1)
-            correct += (y_.cpu()==y.cpu()).sum().item()
-            total += y.size(0)
             if train:
+                x = torchvision.transforms.RandomHorizontalFlip()(x)
+                x = torchvision.transforms.RandomResizedCrop(512, scale=(0.8, 1.0))(x)
+                x = torchvision.transforms.ColorJitter()(x)
                 if type(self.optimizer) == SAMSGD:
                     def closure():
                         self.optimizer.zero_grad()
@@ -97,6 +95,12 @@ class ImageClassifier(object):
                     self.optimizer.step()
                 self.scheduler.step()
                 print(idx, (correct/total)*100, loss.cpu().item())
+            preds = self.model(x.cuda())
+            loss = self.criterion(preds, y.cuda())
+            probs = nn.functional.softmax(preds, 1)
+            y_ = torch.argmax(probs, dim=1)
+            correct += (y_.cpu()==y.cpu()).sum().item()
+            total += y.size(0)
             running_loss += loss.cpu().item()
             iterations += 1
             del x, y
