@@ -22,7 +22,7 @@ def _model_config(args):
         "epochs": int(args.epochs) if args.epochs else 0,
         "train": True if args.train else False,
         "pretrained": True if args.pretrained else False,
-        "save_interval": 10,
+        "save_interval": int(args.save_interval),
         "library": args.library,
         "save_directory": args.save_directory
     }
@@ -67,6 +67,7 @@ if __name__ == "__main__":
     parser.add_argument("--library")
     parser.add_argument("--list")
     parser.add_argument("--save_directory", "-s")
+    parser.add_argument("--save_interval")
     parser.add_argument("--pretrained", action="store_true")
     parser.add_argument("--opMode", action="store_true")
 
