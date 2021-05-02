@@ -30,7 +30,7 @@ class ImageClassifier(object):
         if library == "timm":
             return timm.create_model(name, pretrained=pretrained, num_classes=num_classes)
         else:
-            return Net(num_classes, 0.1)
+            return Net(num_classes)
 
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=2e-5, momentum=0.9, nesterov=True),
