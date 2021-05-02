@@ -187,13 +187,13 @@ class Net(nn.Module):
     def __init__(self, nc, dp=0):
         super(Net, self).__init__()
         self.init_batch_norm = BatchNormalization2D(3)
-        self.head = nn.Conv2d(in_channels=3,out_channels=16,kernel_size=3, stride=4)
+        self.head = nn.Conv2d(in_channels=3,out_channels=8,kernel_size=3, stride=4)
         self.swish = MemoryEfficientSwish()
-        self.bn = BatchNormalization2D(16)
-        self.channels = [16, 32, 64]
+        self.bn = BatchNormalization2D(8)
+        self.channels = [8, 16, 32, 64]
         self.stages = nn.ModuleList([nn.Sequential(
         MBConv(n, n*2, 3, 2, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
-        MBConv(n*2, n*2, 3, 2, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
+        #MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
         #MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
         #MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
         #MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
@@ -207,8 +207,8 @@ class Net(nn.Module):
         self.fc = nn.Linear(self.channels[-1]*2, nc)
 
     def forward(self, x):
-        #with torch.no_grad():
-        #    x = self.init_batch_norm(x)
+        with torch.no_grad():
+            x = self.init_batch_norm(x)
         x = self.head(x)
         x = self.bn(x)
         x = self.swish(x)
