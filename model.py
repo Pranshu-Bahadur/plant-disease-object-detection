@@ -47,7 +47,7 @@ class ImageClassifier(object):
         return scheduler_dict[name]
 
     def _create_criterion(self, name):
-        loss_dict = {"CCE": nn.CrossEntropyLoss(weight=torch.tensor([0.5, 0.5, 0.9])).cuda(),
+        loss_dict = {"CCE": nn.CrossEntropyLoss().cuda(),
                      "MML": nn.MultiMarginLoss().cuda(),
                      "MSE": nn.MSELoss().cuda(),
                      "BCE": nn.BCELoss().cuda()
