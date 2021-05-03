@@ -199,14 +199,12 @@ class Net(nn.Module):
         MBConv(n, n, 3, 4, dp, 18),
         BatchNormalization2D(n),
         MemoryEfficientSwish(),
-         ) for n in self.channels])
-        self.gap = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Linear(self.channels[-1], nc)
-        """
         MBConv(n, n, 3, 1, dp, 18),
         BatchNormalization2D(n),
         MemoryEfficientSwish()
-        """
+         ) for n in self.channels])
+        self.gap = nn.AdaptiveAvgPool2d(1)
+        self.fc = nn.Linear(self.channels[-1], nc)
     def forward(self, x):
         #with torch.no_grad():
         #    x = self.init_batch_norm(x)
