@@ -86,9 +86,9 @@ class ImageClassifier(object):
             loss = self.criterion(preds, y.cuda())
             correct += (y_.cpu()==y.cpu()).sum().item()
             if train:
-                x = torchvision.transforms.RandomHorizontalFlip()(x)
-                x = torchvision.transforms.RandomResizedCrop(512, scale=(0.7, 1.0))(x)
-                x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
+                #x = torchvision.transforms.RandomHorizontalFlip()(x)
+                #x = torchvision.transforms.RandomResizedCrop(512, scale=(0.7, 1.0))(x)
+                #x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
                 if type(self.optimizer) == SAMSGD:
                     def closure():
                         self.optimizer.zero_grad()
@@ -100,7 +100,6 @@ class ImageClassifier(object):
                 else:
                     preds = self.model(x.cuda())
                     preds = torch.nn.functional.dropout2d(preds,0.4)
-
                     loss = self.criterion(preds, y.cuda())
                     loss.backward()
                     self.optimizer.step()
