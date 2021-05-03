@@ -100,7 +100,7 @@ class MBConv(nn.Module):
         else:
             self.expansionLayer = nn.Identity()
 
-        self.depthWiseLayer =  MultiKernelDepthWiseConvolution(inChannels, expansionFactor, 2, stride) #if not self.skip else DepthWiseConvolution(inChannels,kernelSize,stride, expansionFactor)
+        self.depthWiseLayer =  MultiKernelDepthWiseConvolution(inChannels, expansionFactor, 4, stride) #if not self.skip else DepthWiseConvolution(inChannels,kernelSize,stride, expansionFactor)
         self.b = BatchNormalization2D(inChannels*expansionFactor)
         self.sw = MemoryEfficientSwish()
         self.squeezeAndExcitationLayer = SqueezeAndExcitation(inChannels*expansionFactor, reductionDimension)
@@ -191,21 +191,18 @@ class Net(nn.Module):
     def __init__(self, nc, dp=0.2):
         super(Net, self).__init__()
         self.init_batch_norm = BatchNormalization2D(3)
-        self.head = nn.Conv2d(in_channels=3,out_channels=16,kernel_size=3, stride=4)
+        self.head = nn.Conv2d(in_channels=3,out_channels=64,kernel_size=3, stride=4)
         self.swish = MemoryEfficientSwish()
-        self.bn = BatchNormalization2D(16)
-        self.channels = [16, 32, 64, 128]
-        #self.stages = nn.ModuleList([nn.Sequential(MBConv(n, n*2, 3, 2, dp, 18), BatchNormalization2D(n*2), MemoryEfficientSwish(),) for n in self.channels])
-        
+        self.bn = BatchNormalization2D(64)
+        self.channels = [64, 128, 256, 512]
         self.stages = nn.ModuleList([nn.Sequential(
-        PointWiseConvolution(n,n,1,6,False),
-        BatchNormalization2D(n*6),
+        MBConv(n, n*2, 3, 2, dp, 18),
+        BatchNormalization2D(n*2),
         MemoryEfficientSwish(),
-        MultiKernelDepthWiseConvolution(n,6,4,2),
-        PointWiseConvolution(n,n*2,1,6,True),
+        MBConv(n*2, n*2, 3, 1, dp, 18),
         BatchNormalization2D(n*2),
         MemoryEfficientSwish()
-        )for n in self.channels])
+         ) for n in self.channels])
         self.gap = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Linear(self.channels[-1]*2, nc)
 
