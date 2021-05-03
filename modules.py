@@ -192,7 +192,7 @@ class Net(nn.Module):
         self.head = nn.Conv2d(in_channels=3,out_channels=64,kernel_size=3, stride=4)
         self.swish = MemoryEfficientSwish()
         self.bn = BatchNormalization2D(64)
-        self.channels = [64]
+        self.channels = [64, 256]
         self.stages = nn.ModuleList([nn.Sequential(
         MBConv(n, n, 3, 2, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
         MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
@@ -222,7 +222,7 @@ class Net(nn.Module):
         for stage in self.stages:
             x = stage(x)
         #print(x.size(0))
-        x = self.gap(x)
+        #x = self.gap(x)
         x = x.view(-1, self.channels[-1]*4)
         x = self.fc(x)
         return x
