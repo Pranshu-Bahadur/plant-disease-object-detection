@@ -191,10 +191,10 @@ class Net(nn.Module):
     def __init__(self, nc, dp=0.5):
         super(Net, self).__init__()
         self.init_batch_norm = BatchNormalization2D(3)
-        self.head = nn.Conv2d(in_channels=3,out_channels=64,kernel_size=3, stride=4)
+        self.head = nn.Conv2d(in_channels=3,out_channels=32,kernel_size=3, stride=4)
         self.swish = MemoryEfficientSwish()
-        self.bn = BatchNormalization2D(64)
-        self.channels = [64, 128]
+        self.bn = BatchNormalization2D(32)
+        self.channels = [32, 64, 128]
         #self.stages = nn.ModuleList([nn.Sequential(MBConv(n, n*2, 3, 2, dp, 18), BatchNormalization2D(n*2), MemoryEfficientSwish(),) for n in self.channels])
         self.stages = nn.ModuleList([nn.Sequential(
         MultiKernelDepthWiseConvolution(n,1,4,2,bias=True),
@@ -204,7 +204,8 @@ class Net(nn.Module):
         PointWiseConvolution(n,n*2,2,1,True),
         #SqueezeAndExcitation(n*2, n*2//4),
         #BatchNormalization2D(n*2),
-        MemoryEfficientSwish())for n in self.channels])
+        MemoryEfficientSwish(),
+        nn.Dropout2d(dp))for n in self.channels])
         self.gap = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Linear(self.channels[-1]*2, nc)
 
