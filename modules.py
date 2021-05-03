@@ -186,7 +186,7 @@ class MemoryEfficientSwish(nn.Module):
 
 
 class Net(nn.Module):
-    def __init__(self, nc, dp=0):
+    def __init__(self, nc, dp=0.2):
         super(Net, self).__init__()
         self.init_batch_norm = BatchNormalization2D(3)
         self.head = nn.Conv2d(in_channels=3,out_channels=64,kernel_size=3, stride=4)
@@ -195,7 +195,7 @@ class Net(nn.Module):
         self.channels = [64]
         self.stages = nn.ModuleList([nn.Sequential(
         MBConv(n, n, 3, 2, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
-        #MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
+        MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
         #MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
         #MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
         #MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
