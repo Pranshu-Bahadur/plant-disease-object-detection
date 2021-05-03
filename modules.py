@@ -213,7 +213,7 @@ class Net(nn.Module):
         #MBConv(n*2, n*2, 3, 1, dp, 6), BatchNormalization2D(n*2), MemoryEfficientSwish(),
         ) for n in self.channels])
         self.gap = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Linear(self.channels[-1]*4, nc)
+        self.fc = nn.Linear(self.channels[-1]*2, nc)
 
     def forward(self, x):
         #with torch.no_grad():
@@ -225,7 +225,7 @@ class Net(nn.Module):
             x = stage(x)
         #print(x.size(0))
         x = self.gap(x)
-        x = x.view(-1, self.channels[-1]*4)
+        x = x.view(-1, self.channels[-1]*2)
         x = self.fc(x)
         return x
 
