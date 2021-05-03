@@ -197,7 +197,7 @@ class Net(nn.Module):
         self.channels = [16, 32, 48, 64]
         self.stages = nn.ModuleList([nn.Sequential(
         MBConv(n, n+16, 3, 2, dp, 36),
-        BatchNormalization2D(n),
+        BatchNormalization2D(n+16),
         MemoryEfficientSwish()
          ) for n in self.channels])
         self.gap = nn.AdaptiveAvgPool2d(1)
