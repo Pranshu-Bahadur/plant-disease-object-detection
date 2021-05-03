@@ -117,8 +117,8 @@ class MBConv(nn.Module):
         #print(x.size(0))
         y = self.expansionLayer(y)
         y = self.depthWiseLayer(y)
-        #y = self.b(y)
-        #y = self.sw(y)
+        y = self.b(y)
+        y = self.sw(y)
         y = self.squeezeAndExcitationLayer(y)
         y = self.reductionLayer(y)
         if self.skip:
