@@ -198,9 +198,11 @@ class Net(nn.Module):
         #self.stages = nn.ModuleList([nn.Sequential(MBConv(n, n*2, 3, 2, dp, 18), BatchNormalization2D(n*2), MemoryEfficientSwish(),) for n in self.channels])
         self.stages = nn.ModuleList([nn.Sequential(
         MultiKernelDepthWiseConvolution(n,1,4,2),
-        #BatchNormalization2D(n),
-        #MemoryEfficientSwish(),
+        SqueezeAndExcitation(n, n//4),
+        BatchNormalization2D(n),
+        MemoryEfficientSwish(),
         PointWiseConvolution(n,n*2,2,1,True),
+        SqueezeAndExcitation(n*2, n*2//4),
         BatchNormalization2D(n*2),
         MemoryEfficientSwish())for n in self.channels])
         self.gap = nn.AdaptiveAvgPool2d(1)
@@ -210,7 +212,7 @@ class Net(nn.Module):
         #with torch.no_grad():
         #    x = self.init_batch_norm(x)
         x = self.head(x)
-        #x = self.bn(x)
+        x = self.bn(x)
         x = self.swish(x)
         for stage in self.stages:
             x = stage(x)
