@@ -49,7 +49,7 @@ class ImageClassifier(object):
         return scheduler_dict[name]
 
     def _create_criterion(self, name):
-        loss_dict = {"CCE": nn.CrossEntropyLoss().cuda(),
+        loss_dict = {"CCE": nn.CrossEntropyLoss(weight=torch.tensor([0.5,0.5,0.9])).cuda(),
                      "MML": nn.MultiMarginLoss().cuda(),
                      "MSE": nn.MSELoss().cuda(),
                      "BCE": nn.BCELoss().cuda()
@@ -87,7 +87,7 @@ class ImageClassifier(object):
             correct += (y_.cpu()==y.cpu()).sum().item()
             if train:
                 x = torchvision.transforms.RandomHorizontalFlip()(x)
-                x = torchvision.transforms.RandomResizedCrop(512, scale=(0.7, 1.0))(x)
+                x = torchvision.transforms.RandomResizedCrop(320, scale=(0.7, 1.0))(x)
                 x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
                 if type(self.optimizer) == SAMSGD:
                     def closure():
@@ -98,8 +98,8 @@ class ImageClassifier(object):
                         return loss
                     self.optimizer.step(closure)
                 else:
-                    #preds = self.model(x.cuda())
-                    #preds = torch.nn.functional.dropout2d(preds,0.2)
+                    preds = self.model(x.cuda())
+                    preds = torch.nn.functional.dropout2d(preds,0.4)
                     loss = self.criterion(preds, y.cuda())
                     loss.backward()
                     self.optimizer.step()
