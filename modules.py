@@ -194,8 +194,8 @@ class Net(nn.Module):
         self.bn = BatchNormalization2D(16)
         self.channels = [16, 32, 64]
         #self.stages = nn.ModuleList([nn.Sequential(MBConv(n, n*2, 3, 2, dp, 18), BatchNormalization2D(n*2), MemoryEfficientSwish(),) for n in self.channels])
-        self.stages = nn.ModuleList([nn.Sequential(MultiKernelDepthWiseConvolution(n,1,2,2),
-        PointWiseConvolution(n,n*2,2,1,True),
+        self.stages = nn.ModuleList([nn.Sequential(MultiKernelDepthWiseConvolution(n,3,2,2),
+        PointWiseConvolution(n,n*2,2,3,True),
         BatchNormalization2D(n*2), MemoryEfficientSwish())for n in self.channels])
         self.gap = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Linear(self.channels[-1]*2, nc)
