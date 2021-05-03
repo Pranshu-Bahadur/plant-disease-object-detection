@@ -189,12 +189,14 @@ class Net(nn.Module):
     def __init__(self, nc, dp=0.5):
         super(Net, self).__init__()
         self.init_batch_norm = BatchNormalization2D(3)
-        self.head = nn.Conv2d(in_channels=3,out_channels=16,kernel_size=3, stride=4)
+        self.head = nn.Conv2d(in_channels=3,out_channels=16,kernel_size=3, stride=2)
         self.swish = MemoryEfficientSwish()
         self.bn = BatchNormalization2D(16)
-        self.channels = [16, 32, 64, 128, 256, 512]
-        self.stages = nn.ModuleList([nn.Sequential(MBConv(n, n*2, 3, 2, dp, 3), BatchNormalization2D(n*2), MemoryEfficientSwish(),
-        ) for n in self.channels])
+        self.channels = [16, 32, 64]
+        #self.stages = nn.ModuleList([nn.Sequential(MBConv(n, n*2, 3, 2, dp, 18), BatchNormalization2D(n*2), MemoryEfficientSwish(),) for n in self.channels])
+        self.stages = nn.ModuleList([nn.Sequential(MultiKernelDepthWiseConvolution(n,1,2,2),
+        PointWiseConvolution(n,n*2,2,1,True),
+        BatchNormalization2D(n*2), MemoryEfficientSwish())for n in self.channels])
         self.gap = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Linear(self.channels[-1]*2, nc)
 
