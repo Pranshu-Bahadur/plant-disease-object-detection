@@ -115,8 +115,8 @@ class MBConv(nn.Module):
         #print(x.size(0))
         y = self.expansionLayer(y)
         y = self.depthWiseLayer(y)
-        y = self.b(y)
-        y = self.sw(y)
+        #y = self.b(y)
+        #y = self.sw(y)
         y = self.squeezeAndExcitationLayer(y)
         y = self.reductionLayer(y)
         if self.skip:
@@ -194,7 +194,9 @@ class Net(nn.Module):
         self.bn = BatchNormalization2D(16)
         self.channels = [16, 32, 64]
         self.stages = nn.ModuleList([nn.Sequential(
-        #MBConv(n, n, 3, 2, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
+        MBConv(n, n, 3, 2, dp, 3), BatchNormalization2D(n), MemoryEfficientSwish(),
+        MBConv(n, n*2, 3, 2, dp, 3), BatchNormalization2D(n*2), MemoryEfficientSwish(),
+        MBConv(n*2, n, 3, 2, dp, 3), BatchNormalization2D(n), MemoryEfficientSwish(),
         #MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
         MBConv(n, n*2, 3, 2, dp, 3), BatchNormalization2D(n*2), MemoryEfficientSwish(),
         ) for n in self.channels])
