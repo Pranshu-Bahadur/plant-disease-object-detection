@@ -74,7 +74,6 @@ class ImageClassifier(object):
         print(train_acc, train_loss, val_acc, val_loss)
         return train_acc, train_loss, val_acc, val_loss
 
-    #@TODO Add SAMSGD function
     def _train_or_eval(self, loader, train):
         running_loss, correct, total, iterations = 0, 0, 0, 0
         for idx, data in enumerate(loader):
@@ -94,13 +93,14 @@ class ImageClassifier(object):
                     def closure():
                         self.optimizer.zero_grad()
                         outputs = self.model(x.cuda())
-                        outputs = torch.nn.functional.dropout2d(outputs,0.4)
                         loss = self.criterion(outputs, y.cuda())
                         loss.backward()
                         return loss
                     self.optimizer.step(closure)
                 else:
                     preds = self.model(x.cuda())
+                    preds = torch.nn.functional.dropout2d(preds,0.4)
+
                     loss = self.criterion(preds, y.cuda())
                     loss.backward()
                     self.optimizer.step()
