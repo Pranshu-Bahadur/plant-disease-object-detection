@@ -191,10 +191,10 @@ class Net(nn.Module):
     def __init__(self, nc, dp=0.2):
         super(Net, self).__init__()
         self.init_batch_norm = BatchNormalization2D(3)
-        self.head = nn.Conv2d(in_channels=3,out_channels=256,kernel_size=2, stride=4)
+        self.head = nn.Conv2d(in_channels=3,out_channels=1024,kernel_size=2, stride=4)
         self.swish = MemoryEfficientSwish()
-        self.bn = BatchNormalization2D(256)
-        self.channels = [256]
+        self.bn = BatchNormalization2D(1024)
+        self.channels = [1024]
         self.stages = nn.ModuleList([nn.Sequential(
         MBConv(n, n*2, 3, 4, dp, 3),
          ) for n in self.channels])
