@@ -200,7 +200,7 @@ class Net(nn.Module):
         MultiKernelDepthWiseConvolution(n,6,4,2),
         #BatchNormalization2D(n),
         #MemoryEfficientSwish(),
-        PointWiseConvolution(n,n*2,1,6,True),
+        PointWiseConvolution(n,n*2,1,6,False),
         BatchNormalization2D(n*2),
         MemoryEfficientSwish()
         )for n in self.channels])
