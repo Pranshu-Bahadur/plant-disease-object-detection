@@ -199,7 +199,7 @@ class Net(nn.Module):
         
         self.stages = nn.ModuleList([nn.Sequential(
         PointWiseConvolution(n,n,1,6,False),
-        MultiKernelDepthWiseConvolution(n,1,4,2),
+        MultiKernelDepthWiseConvolution(n,6,4,2),
         #BatchNormalization2D(n),
         #MemoryEfficientSwish(),
         PointWiseConvolution(n,n*2,1,6,True),
