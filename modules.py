@@ -194,18 +194,18 @@ class Net(nn.Module):
         self.head = nn.Conv2d(in_channels=3,out_channels=16,kernel_size=3, stride=2)
         self.swish = MemoryEfficientSwish()
         self.bn = BatchNormalization2D(16)
-        self.channels = [16, 32, 64, 128, 256]
+        self.channels = [16, 64, 256, 512, 2048]
         #self.stages = nn.ModuleList([nn.Sequential(MBConv(n, n*2, 3, 2, dp, 18), BatchNormalization2D(n*2), MemoryEfficientSwish(),) for n in self.channels])
         self.stages = nn.ModuleList([nn.Sequential(
         MultiKernelDepthWiseConvolution(n,1,4,2),
         BatchNormalization2D(n),
         #MemoryEfficientSwish(),
-        PointWiseConvolution(n,n*2,1,1,True),
-        BatchNormalization2D(n*2),
+        PointWiseConvolution(n,n*4,1,1,True),
+        BatchNormalization2D(n*4),
         MemoryEfficientSwish()
         )for n in self.channels])
         self.gap = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Linear(self.channels[-1]*2, nc)
+        self.fc = nn.Linear(self.channels[-1]*4, nc)
 
     def forward(self, x):
         #with torch.no_grad():
@@ -217,7 +217,7 @@ class Net(nn.Module):
             x = stage(x)
         #print(x.size(0))
         x = self.gap(x)
-        x = x.view(-1, self.channels[-1]*2)
+        x = x.view(-1, self.channels[-1]*4)
         x = self.fc(x)
         return x
 
