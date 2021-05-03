@@ -50,11 +50,11 @@ class Experiment(object):
         std_sum  /= nimages
         """
         transformations = [
-            transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
-            RandAugment(),
+            #transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
             #RandAugment(),
             #RandAugment(),
-            transforms.Grayscale(3),
+            #RandAugment(),
+            #transforms.Grayscale(3),
             transforms.ToTensor(),
             #transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
