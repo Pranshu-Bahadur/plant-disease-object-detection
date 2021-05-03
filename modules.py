@@ -198,7 +198,7 @@ class Net(nn.Module):
         #self.stages = nn.ModuleList([nn.Sequential(MBConv(n, n*2, 3, 2, dp, 18), BatchNormalization2D(n*2), MemoryEfficientSwish(),) for n in self.channels])
         self.stages = nn.ModuleList([nn.Sequential(
         MultiKernelDepthWiseConvolution(n,6,4,2),
-        #SqueezeAndExcitation(n,4),
+        SqueezeAndExcitation(n,4),
         PointWiseConvolution(n,n*2,2,6,True),
         BatchNormalization2D(n*2),
         MemoryEfficientSwish())for n in self.channels])
@@ -209,7 +209,7 @@ class Net(nn.Module):
         #with torch.no_grad():
         #    x = self.init_batch_norm(x)
         x = self.head(x)
-        x = self.bn(x)
+        #x = self.bn(x)
         x = self.swish(x)
         for stage in self.stages:
             x = stage(x)
