@@ -196,7 +196,7 @@ class Net(nn.Module):
         #self.stages = nn.ModuleList([nn.Sequential(MBConv(n, n*2, 3, 2, dp, 18), BatchNormalization2D(n*2), MemoryEfficientSwish(),) for n in self.channels])
         self.stages = nn.ModuleList([nn.Sequential(
         MultiKernelDepthWiseConvolution(n,1,2,2),
-        SqueezeAndExcitation(n,1),
+        SqueezeAndExcitation(n,4),
         PointWiseConvolution(n,n*2,2,1,True),
         BatchNormalization2D(n*2),
         MemoryEfficientSwish())for n in self.channels])
@@ -212,7 +212,7 @@ class Net(nn.Module):
         for stage in self.stages:
             x = stage(x)
         #print(x.size(0))
-        #x = self.gap(x)
+        x = self.gap(x)
         x = x.view(-1, self.channels[-1]*2)
         x = self.fc(x)
         return x
