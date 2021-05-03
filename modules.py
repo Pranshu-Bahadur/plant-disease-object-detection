@@ -196,7 +196,7 @@ class Net(nn.Module):
         self.stages = nn.ModuleList([nn.Sequential(
         MBConv(n, n, 3, 2, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
         MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
-        #MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
+        MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
         #MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
         #MBConv(n, n, 3, 1, dp, 6), BatchNormalization2D(n), MemoryEfficientSwish(),
         MBConv(n, n*4, 3, 2, dp, 6), BatchNormalization2D(n*4), MemoryEfficientSwish(),
