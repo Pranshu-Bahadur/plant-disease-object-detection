@@ -100,6 +100,7 @@ class ImageClassifier(object):
                         return loss
                     self.optimizer.step(closure)
                 else:   
+                    loss = self.criterion(preds, y.cuda())
                     loss.backward()
                     self.optimizer.step()
                 self.scheduler.step()
