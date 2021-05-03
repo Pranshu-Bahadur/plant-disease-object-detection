@@ -99,7 +99,7 @@ class ImageClassifier(object):
                     self.optimizer.step(closure)
                 else:
                     #preds = self.model(x.cuda())
-                    preds = torch.nn.functional.dropout2d(preds,0.2)
+                    #preds = torch.nn.functional.dropout2d(preds,0.2)
                     loss = self.criterion(preds, y.cuda())
                     loss.backward()
                     self.optimizer.step()
