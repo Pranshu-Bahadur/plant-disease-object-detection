@@ -196,9 +196,9 @@ class Net(nn.Module):
         self.bn = BatchNormalization2D(64)
         self.config = [
             (64, 128, 2),
-            (128, 256, 4),
-            (256, 256, 4),
-            (256, 1024, 2),
+            (128, 128, 4),
+            #(256, 256, 4),
+            #(256, 1024, 2),
             #(32, 64, 1),
             #(64, 128, 2),
             #(128, 256, 2),
@@ -209,7 +209,7 @@ class Net(nn.Module):
         self.stages = nn.ModuleList([nn.Sequential() for stage in self.config])
         for i in range(len(self.config)):
             for j in range(self.config[i][2]):
-                self.stages[i].add_module(str(j+1), MBConv(self.config[i][0], self.config[i][0], 3, 1, 0, 6) if j is not self.config[i][2] - 1 else MBConv(self.config[i][0], self.config[i][1], 3, 2, 0, 6))
+                self.stages[i].add_module(str(j+1), MBConv(self.config[i][0], self.config[i][0], 3, 1, 0, 6) if j is not self.config[i][2] - 1 else MBConv(self.config[i][0], self.config[i][1], 3, 4, 0, 6))
         self.final_conv = nn.Sequential(nn.Conv2d(self.config[-1][1], self.config[-1][1], 1, 1))#, BatchNormalization2D(self.config[-1][1]), MemoryEfficientSwish())
         self.gap = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Linear(self.config[-1][1], nc)
