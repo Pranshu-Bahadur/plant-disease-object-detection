@@ -90,11 +90,11 @@ class ImageClassifier(object):
                 if type(self.optimizer) == SAMSGD:
                     def closure():
                         self.optimizer.zero_grad()
-                        outputs = self.model(x.cuda())
-                        loss = self.criterion(outputs, y.cuda())
+                        preds = self.model(x.cuda())
+                        loss = self.criterion(preds, y.cuda())
                         loss.backward()
                         return loss
-                    self.optimizer.step(closure)
+                    loss = self.optimizer.step(closure)
                 else:
                     preds = self.model(x.cuda())
                     #preds = torch.nn.functional.dropout2d(preds,0.4)
