@@ -37,7 +37,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=2e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=2e-5,nesterov=True),
-                      "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, momentum=0.9, nesterov=True, clipping=1.28, weight_decay=1e-5)
+                      "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, momentum=0.9, nesterov=True, clipping=0.01, weight_decay=1e-5)
         }
         return optim_dict[name]
     
@@ -87,7 +87,7 @@ class ImageClassifier(object):
             correct += (y_.cpu()==y.cpu()).sum().item()
             if train:
                 x = torchvision.transforms.RandomHorizontalFlip()(x)
-                x = torchvision.transforms.RandomResizedCrop(320, scale=(0.8, 1.0))(x)
+                x = torchvision.transforms.RandomResizedCrop(256, scale=(0.8, 1.0))(x)
                 #x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
                 if type(self.optimizer) == SAMSGD:
                     def closure():
