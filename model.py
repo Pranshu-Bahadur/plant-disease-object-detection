@@ -86,7 +86,7 @@ class ImageClassifier(object):
             total += y.size(0)
             if train:
                 #x = torchvision.transforms.RandomHorizontalFlip()(x)
-                x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
+                #x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
                 #x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
                 x = torchvision.transforms.AutoAugment()(x.byte())
                 x = x.float()
