@@ -99,13 +99,16 @@ class ImageClassifier(object):
                     loss.backward()
                     self.optimizer.step()
                 self.scheduler.step()
+                probs = nn.functional.softmax(preds, 1)
+                y_ = torch.argmax(probs, dim=1)
+                correct += (y_.cpu()==y.cpu()).sum().item()
                 print(idx, (correct/total)*100, loss.cpu().item())
             else:
                 preds = self.model(x.cuda())
                 loss = self.criterion(preds, y.cuda())
-            probs = nn.functional.softmax(preds, 1)
-            y_ = torch.argmax(probs, dim=1)
-            correct += (y_.cpu()==y.cpu()).sum().item()
+                probs = nn.functional.softmax(preds, 1)
+                y_ = torch.argmax(probs, dim=1)
+                correct += (y_.cpu()==y.cpu()).sum().item()
             running_loss += loss.cpu().item()
             iterations += 1
             del x, y
