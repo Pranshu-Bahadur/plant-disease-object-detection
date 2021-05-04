@@ -196,15 +196,10 @@ class Net(nn.Module):
         self.bn = BatchNormalization2D(32)
         self.config = [
             (32, 16, 1),
-            (16, 24, 1),
-            (24, 40, 2),
-            (40, 80, 2),
-            (80, 80, 3),
-            (80, 112, 3),
-            (112, 192, 4),
-            (192, 320, 1),
-            (320, 1280, 1)
-        ]
+            (16, 32, 1),
+            (32, 64, 2),
+            (64, 80, 2),
+            (80, 80, 3)]
         self.stages = nn.ModuleList([nn.Sequential() for stage in self.config])
         for i in range(len(self.config)):
             for j in range(self.config[i][2]):
