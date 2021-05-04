@@ -191,28 +191,33 @@ class Net(nn.Module):
     def __init__(self, nc, dp=0.2):
         super(Net, self).__init__()
         self.init_batch_norm = BatchNormalization2D(3)
-        self.head = nn.Conv2d(in_channels=3,out_channels=16,kernel_size=2, stride=2)
+        self.head = nn.Conv2d(in_channels=3,out_channels=32,kernel_size=3, stride=4)
         self.swish = MemoryEfficientSwish()
-        self.bn = BatchNormalization2D(16)
-        self.channels = [16, 32, 48, 64, 80]
-        self.stages = nn.ModuleList([nn.Sequential(
-        MBConv(n, n+16, 3, 2, dp, 6),
-        BatchNormalization2D(n+16),
-        MemoryEfficientSwish(),
-         ) for n in self.channels])
+        self.bn = BatchNormalization2D(32)
+        self.config = [
+            (32, 16, 1),
+            (16, 24, 1),
+            (24, 40, 2),
+            (40, 80, 2),
+            (80, 80, 3),
+            (80, 112, 3),
+            (112, 192, 4),
+            (192, 320, 1),
+            (320, 1280, 1)
+        ]
+        self.stages = nn.ModuleList([nn.Sequential(MBConv(stage[0], stage[0], 3, 1, 0, 6) if s is not stage[2] - 1 else MBConv(stage[0], stage[1], 3, 2, 0, 6) for s in range(stage[2])) for stage in self.config])
+        self.final_conv = nn.Conv2d(self.config[-1][1], self.config[-1][1], 1, 1)
         self.gap = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Linear(self.channels[-1]+16, nc)
+        self.fc = nn.Linear(self.config[-1][1], nc)
     def forward(self, x):
-        #with torch.no_grad():
-        #    x = self.init_batch_norm(x)
         x = self.head(x)
         x = self.bn(x)
         x = self.swish(x)
         for stage in self.stages:
             x = stage(x)
-        #print(x.size(0))
-        #x = self.gap(x)
-        x = x.view(-1, self.channels[-1]+16)
+        x = self.final_conv(x)
+        x = self.gap(x)
+        x = x.view(-1, self.config[-1][1])
         x = self.fc(x)
         return x
 
