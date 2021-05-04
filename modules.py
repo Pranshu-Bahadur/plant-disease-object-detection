@@ -195,11 +195,12 @@ class Net(nn.Module):
         self.swish = MemoryEfficientSwish()
         self.bn = BatchNormalization2D(16)
         self.config = [
-            (16, 32, 1, 2, 1),
-            (32, 48, 1, 2, 4),
+            (16, 32, 1, 1, 1),
+            (32, 48, 1, 1, 4),
             (48, 64, 1, 2, 4),
-            (64, 80, 1, 2, 6),
-            (80, 80, 2, 2, 6),
+            (64, 80, 1, 2, 4),
+            (80, 128, 2, 2, 6),
+            (128, 1024, 4, 2, 6),
             ]
         self.stages = nn.ModuleList([nn.Sequential() for stage in self.config])
         for i in range(len(self.config)):
