@@ -117,8 +117,8 @@ class MBConv(nn.Module):
         #print(x.size(0))
         y = self.expansionLayer(y)
         y = self.depthWiseLayer(y)
-        #y = self.b(y)
-        #y = self.sw(y)
+        y = self.b(y)
+        y = self.sw(y)
         y = self.squeezeAndExcitationLayer(y)
         y = self.reductionLayer(y)
         if self.skip:
@@ -191,24 +191,22 @@ class Net(nn.Module):
     def __init__(self, nc, dp=0.2):
         super(Net, self).__init__()
         self.init_batch_norm = BatchNormalization2D(3)
-        self.head = nn.Conv2d(in_channels=3,out_channels=24,kernel_size=3, stride=2)
+        self.head = nn.Conv2d(in_channels=3,out_channels=16,kernel_size=3, stride=4)
         self.swish = MemoryEfficientSwish()
-        self.bn = BatchNormalization2D(24)
+        self.bn = BatchNormalization2D(16)
         self.config = [
-            (24, 24, 2, 1, 1),
-            (24, 48, 4, 2, 4),
+            (16, 16, 2, 2, 1),
+            (32, 48, 2, 2, 4),
             (48, 64, 4, 2, 4),
-            (64, 128, 4, 2, 6),
-            (128, 160, 9, 1, 6),
-            (160, 272, 15, 2, 6),
+            (64, 128, 8, 2, 6)
             ]
         self.stages = nn.ModuleList([nn.Sequential() for stage in self.config])
         for i in range(len(self.config)):
             for j in range(self.config[i][2]):
                 self.stages[i].add_module(str(j+1), MBConv(self.config[i][0], self.config[i][0], 3, 1, 0, self.config[i][4]) if j is not self.config[i][2] - 1 else MBConv(self.config[i][0], self.config[i][1], 3, self.config[i][3], 0, self.config[i][4]))
-        self.final_conv = nn.Sequential(nn.Conv2d(self.config[-1][1], 1792, 1, 1))#, BatchNormalization2D(self.config[-1][1]), MemoryEfficientSwish())
+        self.final_conv = nn.Sequential(nn.Conv2d(self.config[-1][1], 1024, 1, 1))#, BatchNormalization2D(self.config[-1][1]), MemoryEfficientSwish())
         self.gap = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Linear(1792, nc)
+        self.fc = nn.Linear(1024, nc)
     def forward(self, x):
         x = self.head(x)
         x = self.bn(x)
@@ -217,6 +215,6 @@ class Net(nn.Module):
             x = stage(x)
         x = self.final_conv(x)
         x = self.gap(x)
-        x = x.view(-1, 1792)
+        x = x.view(-1, 1024)
         x = self.fc(x)
         return x
