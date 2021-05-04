@@ -89,7 +89,7 @@ class ImageClassifier(object):
                 x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
                 #x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
                 x = torchvision.transforms.AutoAugment()(x.byte())
-                #x = torchvision.transforms.ToTensor()(x)
+                x = torchvision.transforms.ToTensor()(x)
                 if type(self.optimizer) == SAMSGD:
                     def closure():
                         self.optimizer.zero_grad()
