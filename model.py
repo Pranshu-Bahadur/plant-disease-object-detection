@@ -89,6 +89,7 @@ class ImageClassifier(object):
                 x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
                 #x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
                 x = torchvision.transforms.AutoAugment(interpolation=PIL.Image.ANTIALIAS)(x)
+                x = torchvision.transforms.ToTensor()(x)
                 if type(self.optimizer) == SAMSGD:
                     def closure():
                         self.optimizer.zero_grad()
@@ -111,6 +112,7 @@ class ImageClassifier(object):
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 print(idx, (correct/total)*100, loss.cpu().item())
             else:
+                x = torchvision.transforms.ToTensor()(x)
                 preds = self.model(x.cuda())
                 loss = self.criterion(preds, y.cuda())
                 probs = nn.functional.softmax(preds, 1)
