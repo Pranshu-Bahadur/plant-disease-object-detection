@@ -23,6 +23,8 @@ class ImageClassifier(object):
         self.bs = config["batch_size"]
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
+        self.resolution = config["resolution"]
+        self.counter = 2
         print("Generated model: {}".format(self.name))
         if config["train"] and config["checkpoint"] == "":
            self.model = nn.DataParallel(self.model).cuda()
@@ -76,13 +78,14 @@ class ImageClassifier(object):
 
     def _train_or_eval(self, loader, train):
         running_loss, correct, total, iterations = 0, 0, 0, 0
+        self.counter = self.counter - 1 if self.curr_epoch%5 == 0 else self.counter
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
             total += y.size(0)
             if train:
                 x = torchvision.transforms.RandomHorizontalFlip()(x)
-                x = torchvision.transforms.RandomResizedCrop(224, scale=(0.8, 1.0))(x)
+                x = torchvision.transforms.RandomResizedCrop(self.resolution - 64, scale=(0.8, 1.0))(x)
                 #x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
                 if type(self.optimizer) == SAMSGD:
                     def closure():
