@@ -196,10 +196,7 @@ class Net(nn.Module):
         self.bn = BatchNormalization2D(16)
         self.channels = [16, 32, 48, 64]
         self.stages = nn.ModuleList([nn.Sequential(
-        MBConv(n, n, 3, 1, dp, 6),
-        BatchNormalization2D(n),
-        MemoryEfficientSwish(),
-        MBConv(n, n+16, 3, 2, dp, 6),
+        MBConv(n, n+16, 3, 1, dp, 6),
         BatchNormalization2D(n+16),
         MemoryEfficientSwish(),
          ) for n in self.channels])
