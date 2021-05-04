@@ -68,7 +68,7 @@ class ImageClassifier(object):
         self.curr_epoch += 1
         self.model.train()
         train_acc, train_loss = self._train_or_eval(split[0], True)
-        #self.model.eval()
+        self.model.eval()
         with torch.no_grad():
             val_acc, val_loss = self._train_or_eval(split[1], False)
         print(train_acc, train_loss, val_acc, val_loss)
@@ -82,7 +82,7 @@ class ImageClassifier(object):
             total += y.size(0)
             if train:
                 x = torchvision.transforms.RandomHorizontalFlip()(x)
-                x = torchvision.transforms.RandomResizedCrop(512, scale=(0.8, 1.0))(x)
+                x = torchvision.transforms.RandomResizedCrop(224, scale=(0.8, 1.0))(x)
                 #x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
                 if type(self.optimizer) == SAMSGD:
                     def closure():
@@ -94,7 +94,7 @@ class ImageClassifier(object):
                     self.optimizer.step(closure)
                 else:
                     preds = self.model(x.cuda())
-                    #preds = torch.nn.functional.dropout2d(preds,0.4)
+                    preds = torch.nn.functional.dropout2d(preds,0.4)
                     loss = self.criterion(preds, y.cuda())
                     loss.backward()
                     self.optimizer.step()
