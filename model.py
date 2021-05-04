@@ -38,7 +38,7 @@ class ImageClassifier(object):
 
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
-                      "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5,nesterov=True),
+                      "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
                       "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, momentum=0.9, nesterov=True, clipping=0.08, weight_decay=1e-5)
         }
         return optim_dict[name]
@@ -94,9 +94,9 @@ class ImageClassifier(object):
                         loss = self.criterion(preds, y.cuda())
                         loss.backward()
                         return loss
-                    loss = self.optimizer.step(closure)
-                    self.optimizer.zero_grad()
                     preds = self.model(x.cuda())
+                    self.optimizer.zero_grad()
+                    loss = self.optimizer.step(closure)
                 else:
                     preds = self.model(x.cuda())
                     #preds = torch.nn.functional.dropout2d(preds,0.4)
