@@ -6,7 +6,7 @@ import torch.nn.functional as F
 class BatchNormalization2D(nn.Module):
     def __init__(self, numFeatures):
         super(BatchNormalization2D, self).__init__()
-        self.layer = nn.BatchNorm2d(num_features=numFeatures, momentum=0.99)
+        self.layer = nn.BatchNorm2d(num_features=numFeatures, momentum=1-0.99)
 
     def forward(self, x):
         return self.layer(x)#.clamp(1e-3)
