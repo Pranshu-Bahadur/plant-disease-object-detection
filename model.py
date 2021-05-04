@@ -90,6 +90,7 @@ class ImageClassifier(object):
                 #x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
                 x = torchvision.transforms.AutoAugment()(x.byte())
                 x = x.float()
+                x = torchvision.transforms.Grayscale(3)(x)
                 if type(self.optimizer) == SAMSGD:
                     def closure():
                         self.optimizer.zero_grad()
