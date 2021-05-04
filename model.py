@@ -88,7 +88,7 @@ class ImageClassifier(object):
                 #x = torchvision.transforms.RandomHorizontalFlip()(x)
                 x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
                 #x[:x.size(0)//2] = torchvision.transforms.ColorJitter()(x[:x.size(0)//2])
-                x = torchvision.transforms.AutoAugment(interpolation=PIL.Image.ANTIALIAS)(x)
+                x = torchvision.transforms.AutoAugment(interpolation=PIL.Image.ANTIALIAS)(x.unit8())
                 x = torchvision.transforms.ToTensor()(x)
                 if type(self.optimizer) == SAMSGD:
                     def closure():

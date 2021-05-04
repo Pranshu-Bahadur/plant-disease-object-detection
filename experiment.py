@@ -55,7 +55,7 @@ class Experiment(object):
             #RandAugment(),
             #RandAugment(),
             transforms.Grayscale(3),
-            #transforms.ToTensor(),
+            transforms.ToTensor(),
             #transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
         transformations = transforms.Compose(transformations)
