@@ -205,7 +205,7 @@ class Net(nn.Module):
             (192, 320, 1),
             (320, 1280, 1)
         ]
-        self.stages = nn.ModuleList([nn.Sequential(MBConv(stage[0], stage[0], 3, 1, 0, 6) if s is not stage[2] - 1 else MBConv(stage[0], stage[1], 3, 2, 0, 6) for s in range(stage[2])) for stage in self.config])
+        self.stages = nn.ModuleList([nn.Sequential([MBConv(stage[0], stage[0], 3, 1, 0, 6) if s is not stage[2] - 1 else MBConv(stage[0], stage[1], 3, 2, 0, 6) for s in range(stage[2])]) for stage in self.config])
         self.final_conv = nn.Conv2d(self.config[-1][1], self.config[-1][1], 1, 1)
         self.gap = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Linear(self.config[-1][1], nc)
