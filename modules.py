@@ -198,8 +198,8 @@ class Net(nn.Module):
             #(16, 32, 1, 1, 1),
             #(32, 48, 2, 2, 1),
             #(48, 64, 2, 2, 4),
-            (64, 80, 8, 2, 6),
-            (80, 128, 8, 2, 6),
+            (64, 80, 2, 4, 6),
+            (80, 128, 2, 2, 6),
             #(128, 256, 2, 2, 6),
             ]
         self.stages = nn.ModuleList([nn.Sequential() for stage in self.config])
