@@ -80,11 +80,6 @@ class ImageClassifier(object):
             self.optimizer.zero_grad()
             x, y = data
             total += y.size(0)
-            preds = self.model(x.cuda())
-            probs = nn.functional.softmax(preds, 1)
-            y_ = torch.argmax(probs, dim=1)
-            loss = self.criterion(preds, y.cuda())
-            correct += (y_.cpu()==y.cpu()).sum().item()
             if train:
                 x = torchvision.transforms.RandomHorizontalFlip()(x)
                 x = torchvision.transforms.RandomResizedCrop(256, scale=(0.8, 1.0))(x)
@@ -98,13 +93,19 @@ class ImageClassifier(object):
                         return loss
                     self.optimizer.step(closure)
                 else:
-                    #preds = self.model(x.cuda())
+                    preds = self.model(x.cuda())
                     preds = torch.nn.functional.dropout2d(preds,0.4)
                     loss = self.criterion(preds, y.cuda())
                     loss.backward()
                     self.optimizer.step()
                 self.scheduler.step()
                 print(idx, (correct/total)*100, loss.cpu().item())
+            else:
+                preds = self.model(x.cuda())
+                probs = nn.functional.softmax(preds, 1)
+                y_ = torch.argmax(probs, dim=1)
+                loss = self.criterion(preds, y.cuda())
+                correct += (y_.cpu()==y.cpu()).sum().item()
             running_loss += loss.cpu().item()
             iterations += 1
             del x, y
