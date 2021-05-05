@@ -54,9 +54,9 @@ class Experiment(object):
         #std_sum = [0.2157, 0.2157, 0.2157]
         transformations = [
             transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
-            #RandAugment(),
-            #RandAugment(),
-            #RandAugment(),
+            RandAugment(),
+            RandAugment(),
+            RandAugment(),
             #RandAugment(),
             transforms.Grayscale(3),
             transforms.ToTensor(),
