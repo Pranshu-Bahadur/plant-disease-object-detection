@@ -71,7 +71,7 @@ class ImageClassifier(object):
         self.curr_epoch += 1
         self.model.train()
         train_acc, train_loss = self._train_or_eval(split[0], True)
-        #self.model.eval()
+        self.model.eval()
         with torch.no_grad():
             val_acc, val_loss = self._train_or_eval(split[1], False)
         print(train_acc, train_loss, val_acc, val_loss)
@@ -98,8 +98,9 @@ class ImageClassifier(object):
                     self.optimizer.zero_grad()
                     loss = self.optimizer.step(closure)
                 else:
+                    self.optimizer.zero_grad()
                     preds = self.model(x.cuda())
-                    #preds = torch.nn.functional.dropout2d(preds,0.4)
+                    preds = torch.nn.functional.dropout2d(preds,0.4)
                     loss = self.criterion(preds, y.cuda())
                     loss.backward()
                     self.optimizer.step()
@@ -109,7 +110,6 @@ class ImageClassifier(object):
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 print(idx, (correct/total)*100, loss.cpu().item())
             else:
-                #x = torchvision.transforms.ToTensor()(x)
                 preds = self.model(x.cuda())
                 loss = self.criterion(preds, y.cuda())
                 probs = nn.functional.softmax(preds, 1)
