@@ -51,8 +51,8 @@ class Experiment(object):
         """
         transformations = [
             transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
-            #RandAugment(),
-            #RandAugment(),
+            RandAugment(),
+            RandAugment(),
             #RandAugment(),
             transforms.Grayscale(3),
             transforms.ToTensor(),
