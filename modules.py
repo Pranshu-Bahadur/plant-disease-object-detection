@@ -191,17 +191,17 @@ class Net(nn.Module):
     def __init__(self, nc, dp=0.2):
         super(Net, self).__init__()
         self.init_batch_norm = BatchNormalization2D(3)
-        self.head = nn.Conv2d(in_channels=3,out_channels=48,kernel_size=3, stride=4)
+        self.head = nn.Conv2d(in_channels=1,out_channels=24,kernel_size=3, stride=2)
         self.swish = MemoryEfficientSwish()
-        self.bn = BatchNormalization2D(48)
+        self.bn = BatchNormalization2D(24)
         self.config = [
             #(16, 32, 1, 1, 1),
-            #(24, 24, 2, 1, 1),
-            #(24, 64, 4, 2, 4),
-            (48, 64, 4, 2, 4),
-            (64, 128, 6, 2, 4),
-            (128, 160, 9, 2, 6),
-            (160, 272, 15, 2, 6),
+            (24, 24, 2, 2, 1),
+            (24, 64, 4, 2, 4),
+            (48, 64, 9, 2, 6),
+            (64, 128, 15, 2, 6),
+            #(128, 160, 9, 2, 6),
+            #(160, 272, 15, 2, 6),
             #(80, 96, 8, 2, 6),
             #(96, 112, 6, 2, 6),
             #(112, 128, 8, 2, 6),
@@ -215,9 +215,9 @@ class Net(nn.Module):
         for i in range(len(self.config)):
             for j in range(self.config[i][2]):
                 self.stages[i].add_module(str(j+1), MBConv(self.config[i][0], self.config[i][0], 3, 1, 0, self.config[i][4]) if j is not self.config[i][2] - 1 else MBConv(self.config[i][0], self.config[i][1], 3, self.config[i][3], 0, self.config[i][4]))
-        self.final_conv = nn.Sequential(nn.Conv2d(self.config[-1][1], 1792, 1, 1))#, BatchNormalization2D(self.config[-1][1]), MemoryEfficientSwish())
+        self.final_conv = nn.Sequential(nn.Conv2d(self.config[-1][1], self.config[-1][1], 1, 1))#, BatchNormalization2D(self.config[-1][1]), MemoryEfficientSwish())
         self.gap = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Linear(1792, nc)
+        self.fc = nn.Linear(self.config[-1][1], nc)
     def forward(self, x):
         x = self.head(x)
         x = self.bn(x)
@@ -226,6 +226,6 @@ class Net(nn.Module):
             x = stage(x)
         x = self.final_conv(x)
         x = self.gap(x)
-        x = x.view(-1, 1792)
+        x = x.view(-1, self.config[-1][1])
         x = self.fc(x)
         return x
