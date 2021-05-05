@@ -48,12 +48,12 @@ class MultiKernelDepthWiseConvolution(nn.Module):
         #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 1, stride, 1),
         # BatchNormalization2D((channels*expansionFactor)//nChunks),
         # MemoryEfficientSwish()))
-        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 3, stride, 1), BatchNormalization2D(self.outChannels), MemoryEfficientSwish()))#,  BatchNormalization2D((channels*expansionFactor)//nChunks),MemoryEfficientSwish()))
-        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 5, stride, 1), BatchNormalization2D(self.outChannels), MemoryEfficientSwish()))#,  BatchNormalization2D((channels*expansionFactor)//nChunks), MemoryEfficientSwish()))
-        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 7, stride, 1), BatchNormalization2D(self.outChannels), MemoryEfficientSwish()))
+        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 3, stride, 1), SqueezeAndExcitation(self.outChannels, self.outChannels//4), BatchNormalization2D(self.outChannels), MemoryEfficientSwish()))#,  BatchNormalization2D((channels*expansionFactor)//nChunks),MemoryEfficientSwish()))
+        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 5, stride, 1), SqueezeAndExcitation(self.outChannels, self.outChannels//4), BatchNormalization2D(self.outChannels), MemoryEfficientSwish()))#,  BatchNormalization2D((channels*expansionFactor)//nChunks), MemoryEfficientSwish()))
+        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 7, stride, 1), SqueezeAndExcitation(self.outChannels, self.outChannels//4), BatchNormalization2D(self.outChannels), MemoryEfficientSwish()))
         #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 7, stride, 1)))#, BatchNormalization2D(self.outChannels), MemoryEfficientSwish()))
         #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 7, stride, 1),  BatchNormalization2D((channels*expansionFactor)//nChunks), MemoryEfficientSwish()))
-        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 9, stride, 1), BatchNormalization2D((channels*expansionFactor)//nChunks), MemoryEfficientSwish()))
+        self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 9, stride, 1), SqueezeAndExcitation(self.outChannels, self.outChannels//4), BatchNormalization2D((channels*expansionFactor)//nChunks), MemoryEfficientSwish()))
         #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 11, stride, 1)))#,  BatchNormalization2D((channels*expansionFactor)//nChunks), MemoryEfficientSwish()))
 
         #self.layers.append(nn.Sequential(DepthWiseConvolution((channels*expansionFactor)//nChunks, 2, 1, 1), MemoryEfficientSwish()))
@@ -100,7 +100,7 @@ class MBConv(nn.Module):
         else:
             self.expansionLayer = nn.Identity()
 
-        self.depthWiseLayer =  MultiKernelDepthWiseConvolution(inChannels, expansionFactor, 4, stride) if not self.skip else DepthWiseConvolution(inChannels,kernelSize,stride, expansionFactor)
+        self.depthWiseLayer =  MultiKernelDepthWiseConvolution(inChannels, expansionFactor, 4, stride)# if not self.skip else DepthWiseConvolution(inChannels,kernelSize,stride, expansionFactor)
         self.b = BatchNormalization2D(inChannels*expansionFactor)
         self.sw = MemoryEfficientSwish()
         self.squeezeAndExcitationLayer = SqueezeAndExcitation(inChannels*expansionFactor, reductionDimension)
