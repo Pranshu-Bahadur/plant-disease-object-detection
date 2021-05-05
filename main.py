@@ -71,7 +71,6 @@ if __name__ == "__main__":
     parser.add_argument("--save_interval")
     parser.add_argument("--pretrained", action="store_true")
     parser.add_argument("--opMode", action="store_true")
-    parser.add_argument("--list")
 
     args = parser.parse_args()
     config = _model_config(args)
@@ -88,7 +87,7 @@ if __name__ == "__main__":
     elif args.train:
         experiment._run(args.dataset_directory, config)
     else:
-        dataset = experiment._preprocessing(args.dataset_directory, config["resolution"], False)
+        dataset = experiment._preprocessing(args.dataset_directory, args.list, config["resolution"], False)
         loader = Loader(dataset, experiment.classifier.bs, shuffle=False, num_workers=4)
         experiment.classifier._test(loader)
 
