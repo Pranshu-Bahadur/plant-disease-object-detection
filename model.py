@@ -8,6 +8,7 @@ from modules import Net
 from sam import SAMSGD
 from nfnets import SGD_AGC
 import PIL
+from randaugment import RandAugment
 
 class ImageClassifier(object):
     def __init__(self, config : dict):
@@ -85,6 +86,8 @@ class ImageClassifier(object):
             x, y = data
             total += y.size(0)
             if train:
+                x = torch.tensor(RandAugment()(torchvision.transforms.ToPILImage()(img)) for img in x)
+                #x = RandAugment()(x)
                 #x = torchvision.transforms.RandomHorizontalFlip()(x)
                 #x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
                 if type(self.optimizer) == SAMSGD:
