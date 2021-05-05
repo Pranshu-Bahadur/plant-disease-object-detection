@@ -5,6 +5,7 @@ import torch
 from torch.utils.data import DataLoader as Loader
 from randaugment import RandAugment
 import PIL
+from util import ImageFilelistWithLabels
 
 class Experiment(object):
     def __init__(self, config: dict):
@@ -12,7 +13,7 @@ class Experiment(object):
         
     #@TODO Add normalized weight computation, use weighted random sampler.
     def _run(self, dataset, config: dict):
-        split = self._preprocessing(dataset, config["resolution"], True)
+        split = self._preprocessing(dataset, config["list"], config["resolution"], True)
         init_epoch = self.classifier.curr_epoch
         while (self.classifier.curr_epoch < init_epoch + config["epochs"]):
             loaders = [Loader(ds, self.classifier.bs, shuffle=True, num_workers=4) for ds in split]
@@ -28,7 +29,7 @@ class Experiment(object):
                 self.classifier._save(config["save_directory"], "{}-{}".format(self.classifier.name, self.classifier.curr_epoch))
         print("Run Complete.")
 
-    def _preprocessing(self, directory, resolution, train):
+    def _preprocessing(self, directory, order_list, resolution, train):
         """
         mean_sum = [0, 0, 0]
         transformations = [
@@ -62,7 +63,7 @@ class Experiment(object):
             #transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
         transformations = transforms.Compose(transformations)
-        dataSetFolder = torchvision.datasets.ImageFolder(root=directory, transform=transformations)
+        dataSetFolder = ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#torchvision.datasets.ImageFolder(root=directory, transform=transformations)
         if train:
             trainingValidationDatasetSize = int(0.7 * len(dataSetFolder))
             testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)

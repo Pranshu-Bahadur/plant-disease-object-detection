@@ -24,7 +24,8 @@ def _model_config(args):
         "pretrained": True if args.pretrained else False,
         "save_interval": int(args.save_interval),
         "library": args.library,
-        "save_directory": args.save_directory
+        "save_directory": args.save_directory,
+        "list": args.list
     }
     return config
 
@@ -70,6 +71,7 @@ if __name__ == "__main__":
     parser.add_argument("--save_interval")
     parser.add_argument("--pretrained", action="store_true")
     parser.add_argument("--opMode", action="store_true")
+    parser.add_argument("--list")
 
     args = parser.parse_args()
     config = _model_config(args)
