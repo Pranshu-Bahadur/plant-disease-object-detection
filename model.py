@@ -46,7 +46,7 @@ class ImageClassifier(object):
     
     def _create_scheduler(self, name, optimizer):
         scheduler_dict = {
-            "StepLR": torch.optim.lr_scheduler.StepLR(optimizer, step_size=11, gamma=0.97),
+            "StepLR": torch.optim.lr_scheduler.StepLR(optimizer, step_size=2.4, gamma=0.97),
             "CosineAnnealing": torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, 50, 2)
         }
         return scheduler_dict[name]
@@ -85,7 +85,7 @@ class ImageClassifier(object):
             x, y = data
             total += y.size(0)
             if train:
-                #x = torchvision.transforms.RandomHorizontalFlip()(x)
+                x = torchvision.transforms.RandomHorizontalFlip()(x)
                 #x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
                 if type(self.optimizer) == SAMSGD:
                     def closure():
