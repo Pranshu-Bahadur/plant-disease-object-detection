@@ -85,7 +85,7 @@ class ImageClassifier(object):
             x, y = data
             total += y.size(0)
             if train:
-                #x = torchvision.transforms.RandomHorizontalFlip()(x)
+                x = torchvision.transforms.RandomHorizontalFlip()(x)
                 #x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
                 if type(self.optimizer) == SAMSGD:
                     def closure():
