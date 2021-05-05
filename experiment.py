@@ -49,14 +49,17 @@ class Experiment(object):
         mean_sum /= nimages
         std_sum  /= nimages
         """
+        mean_sum = [0.5675, 0.5675, 0.5675]
+        std_sum = [0.2157, 0.2157, 0.2157]
         transformations = [
             transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
             RandAugment(),
             RandAugment(),
             #RandAugment(),
+            #RandAugment(),
             transforms.Grayscale(3),
             transforms.ToTensor(),
-            #transforms.Normalize(mean=mean_sum, std=std_sum)
+            transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
         transformations = transforms.Compose(transformations)
         dataSetFolder = torchvision.datasets.ImageFolder(root=directory, transform=transformations)
