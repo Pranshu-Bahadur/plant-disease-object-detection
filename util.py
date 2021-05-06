@@ -52,7 +52,7 @@ def default_flist_reader_1(flist):
 	with open(flist, 'r') as rf:
 		for line in rf.readlines():
 			impath = line.split("\n")
-			imlist.append((impath[0], 0 if "health" in impath[0] or ("extra" in impath[0] and "0" in impath[0][-5]) else (1 if "sick" in impath[0] else 2)))
+			imlist.append((impath[0], 0 if "health" in impath[0] or ("extra" in impath[0] and (("da+db" and "nx" in impath[0]) or "0" in impath[0][-5])) else (1 if "sick" in impath[0] else 2)))
 	#print(imlist)
 	return imlist
 
