@@ -72,7 +72,7 @@ class ImageClassifier(object):
         self.curr_epoch += 1
         self.model.train()
         train_acc, train_loss = self._train_or_eval(split[0], True)
-        #self.model.eval()
+        self.model.eval()
         with torch.no_grad():
             val_acc, val_loss = self._train_or_eval(split[1], False)
         print(train_acc, train_loss, val_acc, val_loss)
