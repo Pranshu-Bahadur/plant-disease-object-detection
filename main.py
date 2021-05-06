@@ -32,7 +32,7 @@ def _model_config(args):
 
 
 def _tbx11k_output(classifier, dataset: Loader):
-    classifier.model.eval()
+    #classifier.model.eval()
     with torch.no_grad():
         with open('outputs/{}-submission.txt'.format(classifier.name), "w+") as output:
             result = ""
