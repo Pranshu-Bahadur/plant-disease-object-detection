@@ -80,7 +80,7 @@ class ImageClassifier(object):
 
     def _train_or_eval(self, loader, train):
         running_loss, correct, total, iterations = 0, 0, 0, 0
-        if self.curr_epoch+1%5:
+        if self.curr_epoch+1%20:
             self.counter = max(self.counter - 1, 0)
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
