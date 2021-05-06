@@ -117,8 +117,8 @@ class MBConv(nn.Module):
         #print(x.size(0))
         y = self.expansionLayer(y)
         y = self.depthWiseLayer(y)
-        y = self.b(y)
-        y = self.sw(y)
+        #y = self.b(y)
+        #y = self.sw(y)
         y = self.squeezeAndExcitationLayer(y)
         y = self.reductionLayer(y)
         if self.skip:
@@ -197,8 +197,8 @@ class Net(nn.Module):
         self.config = [
             #(16, 32, 1, 1, 1),
             (24, 24, 2, 1, 1),
-            (24, 48, 6, 2, 4),
-            (48, 64, 6, 2, 4),
+            (24, 48, 4, 2, 4),
+            (48, 64, 4, 2, 4),
             (64, 128, 6, 2, 4),
             (128, 160, 9, 1, 6),
             (160, 272, 15, 2, 6),
