@@ -69,13 +69,13 @@ class ImageClassifier(object):
         torch.save(self.model.state_dict(), "{}/./{}.pth".format(directory, name))
 
     def _run_epoch(self, split):
-        self.curr_epoch += 1
         self.model.train()
         train_acc, train_loss = self._train_or_eval(split[0], True)
         self.model.eval()
         with torch.no_grad():
             val_acc, val_loss = self._train_or_eval(split[1], False)
         print(train_acc, train_loss, val_acc, val_loss)
+        self.curr_epoch += 1
         return train_acc, train_loss, val_acc, val_loss
 
     def _train_or_eval(self, loader, train):
