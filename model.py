@@ -80,12 +80,14 @@ class ImageClassifier(object):
 
     def _train_or_eval(self, loader, train):
         running_loss, correct, total, iterations = 0, 0, 0, 0
-        self.counter = max(self.counter - 1, 0)
+        if self.curr_epoch%10:
+            self.counter = max(self.counter - 1, 0)
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
             total += y.size(0)
             if train:
+                x = torchvision.transforms.Resize(self.resolution - 64*self.counter,interpolation=PIL.Image.ANTIALIAS)(x)
                 x = torch.stack([torchvision.transforms.ToTensor()(RandAugment()(torchvision.transforms.ToPILImage()(img))) for img in x])
                 #x = RandAugment()(x)
                 #x = torchvision.transforms.RandomHorizontalFlip()(x)
