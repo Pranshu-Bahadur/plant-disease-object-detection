@@ -78,7 +78,7 @@ if __name__ == "__main__":
     if args.opMode:
         transformations = [
             transforms.Resize([int(args.resolution), int(args.resolution)], PIL.Image.ANTIALIAS),
-            transforms.Grayscale(1),
+            transforms.Grayscale(3),
             transforms.ToTensor(),
         ]
         transformations = transforms.Compose(transformations)
