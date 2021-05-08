@@ -122,7 +122,7 @@ class ImageClassifier(object):
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 print(idx, (correct/total)*100, loss.cpu().item())
             else:
-                self.writer.add_graph(self.model, x.cuda())
+                self.writer.add_graph(self.model, x)
                 preds = self.model(x.cuda())
                 loss = self.criterion(preds, y.cuda())
                 probs = nn.functional.softmax(preds, 1)
