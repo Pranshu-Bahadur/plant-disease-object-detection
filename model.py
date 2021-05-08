@@ -28,8 +28,9 @@ class ImageClassifier(object):
         self.resolution = config["resolution"]
         self.counter = 2
         print("Generated model: {}".format(self.name))
-        if config["train"] and config["checkpoint"] == "":
-           self.model = nn.DataParallel(self.model).cuda()
+
+        #if config["train"] and config["checkpoint"] == "":
+        #   self.model = nn.DataParallel(self.model).cuda()
 
         
     def _create_model(self, library, name, pretrained, num_classes):
@@ -121,6 +122,7 @@ class ImageClassifier(object):
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 print(idx, (correct/total)*100, loss.cpu().item())
             else:
+                self.writer.add_graph(self.model.module)
                 preds = self.model(x.cuda())
                 loss = self.criterion(preds, y.cuda())
                 probs = nn.functional.softmax(preds, 1)
