@@ -29,8 +29,8 @@ class ImageClassifier(object):
         self.counter = 2
         print("Generated model: {}".format(self.name))
 
-        #if config["train"] and config["checkpoint"] == "":
-        #   self.model = nn.DataParallel(self.model).cuda()
+        if config["train"] and config["checkpoint"] == "":
+           self.model = nn.DataParallel(self.model).cuda()
 
         
     def _create_model(self, library, name, pretrained, num_classes):
