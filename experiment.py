@@ -16,7 +16,7 @@ class Experiment(object):
         split = self._preprocessing(dataset, config["list"], config["resolution"], True)
         init_epoch = self.classifier.curr_epoch
         while (self.classifier.curr_epoch < init_epoch + config["epochs"]):
-            loaders = [Loader(ds, self.classifier.bs, shuffle=True, num_workers=4) for ds in split]
+            loaders = [Loader(ds, self.classifier.bs, shuffle=True, num_workers=16) for ds in split]
             train_acc, train_loss, val_acc, val_loss = self.classifier._run_epoch(loaders)
 
             print("Epoch: {} | Training Accuracy: {} | Training Loss: {} | Validation Accuracy: {} | Validation Loss: {}".format(self.classifier.curr_epoch, train_acc, train_loss, val_acc, val_loss))
