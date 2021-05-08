@@ -13,7 +13,7 @@ from randaugment import RandAugment
 class ImageClassifier(object):
     def __init__(self, config : dict):
         self.model = self._create_model(config["library"], config["model_name"], config["pretrained"], config["num_classes"])
-        if config["train"]:
+        if True:
             self.optimizer = self._create_optimizer(config["optimizer_name"], self.model, config["learning_rate"])
             self.scheduler = self._create_scheduler(config["scheduler_name"], self.optimizer)
             self.criterion = self._create_criterion(config["criterion_name"])
