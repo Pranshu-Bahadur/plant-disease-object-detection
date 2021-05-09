@@ -94,7 +94,7 @@ class ImageClassifier(object):
         if train:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-            self.bs = self.bs//2 if self.bs>=128 else 64
+            self.bs = self.bs//2 if self.bs>128 else 128
             #self.optimizer.clipping *= 2
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
