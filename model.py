@@ -100,11 +100,11 @@ class ImageClassifier(object):
             if train:
                 #x = torch.stack([torchvision.transforms.ToTensor()(RandAugment()(torchvision.transforms.ToPILImage()(img))) for img in x])
                 
-                for img in x:
-                    img = torchvision.transforms.ToPILImage()(img)
-                    torchvision.transforms.Resize(128,interpolation=PIL.Image.ANTIALIAS)(img)#self.resolution - 64*self.counter
+                for i in range(x.size(0)):
+                    x[i] = torchvision.transforms.ToPILImage()(x[i])
+                    x[i] = torchvision.transforms.Resize(128,interpolation=PIL.Image.ANTIALIAS)(x[i])#self.resolution - 64*self.counter
                     for _ in range(4 - self.counter):
-                        img = RandAugment()(img)
+                        x[i] = RandAugment()(x[i])
                 
                 print(x[0].size())
                 
