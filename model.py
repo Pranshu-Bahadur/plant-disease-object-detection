@@ -135,7 +135,7 @@ class ImageClassifier(object):
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 print(idx, (correct/total)*100, loss.cpu().item())
             else:
-                if self.curr_epoch==self.final_epoch:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
+                if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
                     inputs = x.to('cpu')
                     #inputs = torchvision.transforms.functional.adjust_contrast(inputs, 1.25)
@@ -154,7 +154,7 @@ class ImageClassifier(object):
             iterations += 1
             del x, y
             torch.cuda.empty_cache()
-            if self.curr_epoch==self.final_epoch:
+            if self.curr_epoch==self.final_epoch-1:
                 classes.pop()
                 preds.pop()
                 classes = torch.stack(classes, dim=0).view(-1)
