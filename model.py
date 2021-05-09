@@ -102,8 +102,8 @@ class ImageClassifier(object):
                 
                 for img in x:
                     img = torchvision.transforms.ToPILImage()(img)
-                    img = torchvision.transforms.Resize(self.resolution - 64*self.counter,interpolation=PIL.Image.ANTIALIAS)(img)
-                    for _ in range(3 - self.counter):
+                    #img = torchvision.transforms.Resize(self.resolution - 64*self.counter,interpolation=PIL.Image.ANTIALIAS)(img)
+                    for _ in range(4 - self.counter):
                         img = RandAugment()(img)
                 
                 #x = RandAugment()(x)
