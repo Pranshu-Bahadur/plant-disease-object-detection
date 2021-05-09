@@ -93,9 +93,10 @@ class ImageClassifier(object):
         preds_cfm = []
         if self.curr_epoch%5 == 0:
             self.counter = max(self.counter - 1, 0)
+            print("Changing resolution...")
+        if self.curr_epoch%4 == 0:
             self.bs /=2
             self.optimizer.clipping *= 2
-            print("test")
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
