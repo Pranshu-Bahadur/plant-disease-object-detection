@@ -33,7 +33,7 @@ class ImageClassifier(object):
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
         self.resolution = config["resolution"]
-        self.counter = 5
+        self.counter = 4
         self.final_epoch = config["epochs"]
         print("Generated model: {}".format(self.name))
 
@@ -94,7 +94,7 @@ class ImageClassifier(object):
         if train:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-            self.bs = self.bs//2 if self.bs>16 else 16
+            self.bs = self.bs//2 if self.bs>256 else 128
             #self.optimizer.clipping *= 2
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
