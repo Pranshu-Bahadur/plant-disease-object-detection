@@ -94,8 +94,8 @@ class ImageClassifier(object):
         if train:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-            self.bs = self.bs//2
-            self.optimizer.clipping *= 2
+            self.bs = self.bs//2 if self.bs>16 else 16
+            #self.optimizer.clipping *= 2
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
@@ -184,6 +184,6 @@ class ImageClassifier(object):
         pass
 
     def RA_Helper(self, x, i):
-        for _ in range(5 - i):
+        for _ in range(3 - i):
             x = RandAugment()(x)
         return x
