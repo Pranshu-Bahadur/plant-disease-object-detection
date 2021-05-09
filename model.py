@@ -91,7 +91,7 @@ class ImageClassifier(object):
         running_loss, correct, total, iterations = 0, 0, 0, 0
         classes = []
         preds_cfm = []
-        if self.curr_epoch+1%5:
+        if self.curr_epoch+1%5 == 0:
             self.counter = max(self.counter - 1, 0)
             self.bs /=2
             self.optimizer.param_groups[0]['clipping'] *= 2
