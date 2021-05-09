@@ -94,7 +94,7 @@ class ImageClassifier(object):
         if self.curr_epoch+1%5:
             self.counter = max(self.counter - 1, 0)
             self.bs /=2
-            self.optimizer.clipping *= 2
+            self.optimizer.param_groups['clipping'] *= 2
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
