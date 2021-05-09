@@ -91,10 +91,10 @@ class ImageClassifier(object):
         running_loss, correct, total, iterations = 0, 0, 0, 0
         classes = []
         preds_cfm = []
-        if self.curr_epoch%5 == 0:
+        if self.curr_epoch%5 == 0 and train:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-        if self.curr_epoch%4 == 0:
+        if self.curr_epoch%4 == 0 and train:
             self.bs /=2
             self.optimizer.clipping *= 2
         for idx, data in enumerate(loader):
