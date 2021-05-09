@@ -91,10 +91,10 @@ class ImageClassifier(object):
         running_loss, correct, total, iterations = 0, 0, 0, 0
         classes = []
         preds_cfm = []
-        if train:
+        if train and (self.curr_epoch+1)%10==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-            self.bs = self.bs//2 if self.bs>256 else 256
+            self.bs = self.bs//2 if self.bs>128 else 128
             #self.optimizer.clipping *= 2
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
@@ -154,18 +154,18 @@ class ImageClassifier(object):
             iterations += 1
             del x, y
             torch.cuda.empty_cache()
-            if self.curr_epoch==self.final_epoch-1:
-                classes.pop()
-                preds.pop()
-                classes = torch.stack(classes, dim=0).view(-1)
-                preds_cfm = torch.stack(preds_cfm, dim=0).view(-1)
-                print(classes.size(), preds.size())
-                cfm = confusion_matrix(classes.cpu().numpy(),preds.cpu().numpy())
-                classes=["0","1","2"]
-                df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
-                plt.figure(figsize=(5,5))
-                cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
-                cfm_plot.figure.savefig('/home/fraulty/ws/RP_TBX11K/content/cfmtbx_{}.png'.format("train" if train else "validation"))
+        if self.curr_epoch==self.final_epoch-1:
+            classes.pop()
+            preds.pop()
+            classes = torch.stack(classes, dim=0).view(-1)
+            preds_cfm = torch.stack(preds_cfm, dim=0).view(-1)
+            print(classes.size(), preds.size())
+            cfm = confusion_matrix(classes.cpu().numpy(),preds.cpu().numpy())
+            classes=["0","1","2"]
+            df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
+            plt.figure(figsize=(5,5))
+            cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
+            cfm_plot.figure.savefig('/home/fraulty/ws/RP_TBX11K/content/cfmtbx_{}.png'.format("train" if train else "validation"))
 
         return float(correct/float(total))*100, float(running_loss/iterations)
 
