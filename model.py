@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.005)#SGD_AGC(model_params.parameters(), lr=lr, momentum=0.9, nesterov=True, clipping=0.32, weight_decay=1e-5)
+                      "SGDAGC": AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, momentum=0.9, nesterov=True, clipping=0.32, weight_decay=1e-5)
         }
         return optim_dict[name]
     
@@ -91,11 +91,11 @@ class ImageClassifier(object):
         running_loss, correct, total, iterations = 0, 0, 0, 0
         classes = []
         preds_cfm = []
-        if self.curr_epoch%5 == 0 and train:
+        if self.curr_epoch+1%5 == 0 and train:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-        if self.curr_epoch%4 == 0 and train:
-            self.bs /=2
+        if self.curr_epoch+1%4 == 0 and train:
+            self.bs = self.bs//2
             self.optimizer.clipping *= 2
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
