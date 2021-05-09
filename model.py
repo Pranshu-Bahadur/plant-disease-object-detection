@@ -6,7 +6,7 @@ from torch.utils.tensorboard import SummaryWriter
 import timm
 from modules import Net
 from sam import SAMSGD
-from nfnets import SGD_AGC
+from nfnets import SGD_AGC, AGC
 import PIL
 from randaugment import RandAugment
 from sklearn.metrics import plot_confusion_matrix, confusion_matrix
@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, momentum=0.9, nesterov=True, clipping=0.08, weight_decay=1e-5)
+                      "SGDAGC": AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.32)#SGD_AGC(model_params.parameters(), lr=lr, momentum=0.9, nesterov=True, clipping=0.32, weight_decay=1e-5)
         }
         return optim_dict[name]
     
