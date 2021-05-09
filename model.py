@@ -33,7 +33,7 @@ class ImageClassifier(object):
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
         self.resolution = config["resolution"]
-        self.counter = 4
+        self.counter = 5
         self.final_epoch = config["epochs"]
         print("Generated model: {}".format(self.name))
 
@@ -184,6 +184,6 @@ class ImageClassifier(object):
         pass
 
     def RA_Helper(self, x, i):
-        for _ in range(3 - i):
+        for _ in range(4 - i):
             x = RandAugment()(x)
         return x
