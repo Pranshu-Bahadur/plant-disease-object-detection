@@ -184,6 +184,6 @@ class ImageClassifier(object):
         pass
 
     def RA_Helper(self, x, i):
-        for _ in range(2 - i):
+        for _ in range(3 - i):
             x = RandAugment()(x)
         return x
