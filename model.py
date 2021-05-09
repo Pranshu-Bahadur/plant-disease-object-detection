@@ -99,7 +99,7 @@ class ImageClassifier(object):
             total += y.size(0)
             if train:
                 #x = torch.stack([torchvision.transforms.ToTensor()(RandAugment()(torchvision.transforms.ToPILImage()(img))) for img in x])
-                
+                x = torchvision.transforms.ToPILImage()(x)
                 for i in range(x.size(0)):
                     print(x[i].size())
                     x[i] = torchvision.transforms.ToPILImage()(x[i][0])
