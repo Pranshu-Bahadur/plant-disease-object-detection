@@ -107,7 +107,7 @@ class ImageClassifier(object):
                         img = RandAugment()(img)
                 
                 #x = RandAugment()(x)
-                x = torchvision.transforms.RandomHorizontalFlip()(x)
+                #x = torchvision.transforms.RandomHorizontalFlip()(x)
                 #x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
                 if type(self.optimizer) == SAMSGD:
                     def closure():
