@@ -106,6 +106,8 @@ class ImageClassifier(object):
                     for _ in range(4 - self.counter):
                         img = RandAugment()(img)
                 
+                print(x[0].size())
+                
                 #x = RandAugment()(x)
                 #x = torchvision.transforms.RandomHorizontalFlip()(x)
                 #x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
