@@ -33,7 +33,7 @@ class ImageClassifier(object):
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
         self.resolution = config["resolution"]
-        self.counter = 2
+        self.counter = 3
         self.final_epoch = config["epochs"]
         print("Generated model: {}".format(self.name))
 
