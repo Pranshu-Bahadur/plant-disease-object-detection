@@ -99,6 +99,7 @@ class ImageClassifier(object):
             total += y.size(0)
             if train:
                 x = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 64*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter)) for img in x])
+                print(x[0].size())
                 if type(self.optimizer) == SAMSGD:
                     def closure():
                         self.optimizer.zero_grad()
