@@ -33,7 +33,7 @@ class ImageClassifier(object):
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
         self.resolution = config["resolution"]
-        self.counter = 2
+        self.counter = 3
         self.final_epoch = config["epochs"]
         print("Generated model: {}".format(self.name))
 
@@ -91,7 +91,7 @@ class ImageClassifier(object):
         running_loss, correct, total, iterations = 0, 0, 0, 0
         classes = []
         preds_cfm = []
-        if self.curr_epoch+1%5 == 0:
+        if self.curr_epoch%5 == 0:
             self.counter = max(self.counter - 1, 0)
             self.bs /=2
             self.optimizer.param_groups[0]['clipping'] *= 2
