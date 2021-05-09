@@ -99,20 +99,6 @@ class ImageClassifier(object):
             total += y.size(0)
             if train:
                 x = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 64*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter)) for img in x])
-                """
-                x = torchvision.transforms.ToPILImage()(x)
-                for i in range(x.size(0)):
-                    print(x[i].size())
-                    x[i] = torchvision.transforms.ToPILImage()(x[i][0])
-                    x[i] = torchvision.transforms.Resize(128,interpolation=PIL.Image.ANTIALIAS)(x[i])#
-                    for _ in range(4 - self.counter):
-                        x[i] = RandAugment()(x[i])
-                """
-                print(x[0].size())
-                
-                #x = RandAugment()(x)
-                #x = torchvision.transforms.RandomHorizontalFlip()(x)
-                #x = torchvision.transforms.RandomResizedCrop(self.resolution, scale=(0.7, 1.0))(x)
                 if type(self.optimizer) == SAMSGD:
                     def closure():
                         self.optimizer.zero_grad()
