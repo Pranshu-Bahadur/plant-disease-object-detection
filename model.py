@@ -110,7 +110,7 @@ class ImageClassifier(object):
                 x_ = torch.cat(x_, dim=0)
                 shuffle_seed = torch.randperm(x_.size(0))
                 x = x_[shuffle_seed]
-                y = torc.cat(y_, dim=0)[shuffle_seed]
+                y = torch.cat(y_, dim=0)[shuffle_seed]
                 print(x.size())
                     #torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
                 if type(self.optimizer) == SAMSGD or type(self.optimizer) == AGC:
