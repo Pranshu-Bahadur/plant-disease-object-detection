@@ -111,7 +111,7 @@ class ImageClassifier(object):
                         loss.backward()
                         return loss
                     preds = self.model(x.cuda())
-                    self.optimizer.zero_grad()
+                    #self.optimizer.zero_grad()
                     loss = self.optimizer.step(closure)
 
                 #else:
