@@ -101,10 +101,10 @@ class ImageClassifier(object):
             x, y = data
             total += y.size(0)
             if train:
-                x = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, y)) for img in x])
-                print(x.size())
                 for i in range(3):
-                    torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
+                    x[y==i] = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, y)) for img in x[y==i]])
+                print(x.size())
+                    #torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
                 if type(self.optimizer) == SAMSGD: #or type(self.optimizer) == AGC:
                     def closure():
                         self.optimizer.zero_grad()
@@ -187,8 +187,8 @@ class ImageClassifier(object):
         pass
 
     def RA_Helper(self, x, i, y):
-        for i in range(3):
-            torchvision.utils.save_image(x[y==i][0], "/content/Before_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
+        torchvision.utils.save_image(x, "/content/Before_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
         for _ in range(3 - i):
             x = RandAugment()(x)
+        torchvision.utils.save_image(x, "/content/After_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
         return x
