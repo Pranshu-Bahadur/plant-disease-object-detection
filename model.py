@@ -178,7 +178,7 @@ class ImageClassifier(object):
             classes = torch.stack(classes, dim=0).view(-1)
             preds_cfm = torch.stack(preds_cfm, dim=0).view(-1)
             print(classes.size(), preds.size())
-            cfm = confusion_matrix(classes.cpu().numpy(),preds.cpu().numpy())
+            cfm = confusion_matrix(classes.cpu().detach().numpy(),preds_cfm.cpu().detach().numpy())
             classes=["0","1","2"]
             df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
             plt.figure(figsize=(5,5))
