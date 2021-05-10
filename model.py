@@ -115,7 +115,7 @@ class ImageClassifier(object):
                     loss = self.optimizer.step(closure)
 
                 #else:
-                    if self.curr_epoch==self.final_epoch:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
+                    if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
                         inputs = x.to('cpu')
                     #inputs = torchvision.transforms.functional.adjust_contrast(inputs, 1.25)
@@ -124,12 +124,12 @@ class ImageClassifier(object):
                         op = self.model(inputs)
                         _, p = torch.max(op, 1)
                         preds_cfm.append(p)
-                    self.optimizer.zero_grad()
-                    preds = self.model(x.cuda())
+                    #self.optimizer.zero_grad()
+                    #preds = self.model(x.cuda())
                     #preds = torch.nn.functional.dropout2d(preds,0.4)
-                    loss = self.criterion(preds, y.cuda())
-                    loss.backward()
-                    self.optimizer.step()
+                    #loss = self.criterion(preds, y.cuda())
+                    #oss.backward()
+                    #self.optimizer.step()
                 self.scheduler.step()
                 probs = nn.functional.softmax(preds, 1)
                 y_ = torch.argmax(probs, dim=1)
