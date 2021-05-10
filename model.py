@@ -103,9 +103,8 @@ class ImageClassifier(object):
             if train:
                 x_ = []
                 for i in range(3):
-                    x_.append(torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i])
-                x_ = np.shuffle(x_)
-                x = torch.stack(x_)
+                    x_.torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]])
+                x = x_[torch.randperm(x_size(0))]
                 print(x.size())
                     #torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
                 if type(self.optimizer) == SAMSGD: #or type(self.optimizer) == AGC:
