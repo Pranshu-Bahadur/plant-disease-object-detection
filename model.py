@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=2e-05, nesterov=True, momentum=0.9) #,###
+                      "SGDAGC": AGC(model_params.parameters(), SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=2e-05, nesterov=True, momentum=0.9) #,###
         }
         return optim_dict[name]
     
@@ -120,7 +120,7 @@ class ImageClassifier(object):
                     #self.optimizer.zero_grad()
                     loss = self.optimizer.step(closure)
 
-                else:
+                #else:
                     if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
                         inputs = x.to('cpu')
@@ -131,11 +131,11 @@ class ImageClassifier(object):
                         _, p = torch.max(op, 1)
                         preds_cfm.append(p)
                     self.optimizer.zero_grad()
-                    preds = self.model(x.cuda())
+                    #preds = self.model(x.cuda())
                     #preds = torch.nn.functional.dropout2d(preds,0.4)
-                    loss = self.criterion(preds, y.cuda())
-                    loss.backward()
-                    self.optimizer.step()
+                    #loss = self.criterion(preds, y.cuda())
+                    #loss.backward()
+                    #self.optimizer.step()
                 self.scheduler.step()
                 probs = nn.functional.softmax(preds, 1)
                 y_ = torch.argmax(probs, dim=1)
