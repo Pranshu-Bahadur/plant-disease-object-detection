@@ -33,7 +33,7 @@ class ImageClassifier(object):
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
         self.resolution = config["resolution"]
-        self.counter = 3
+        self.counter = 2
         self.final_epoch = config["epochs"]
         print("Generated model: {}".format(self.name))
 
@@ -95,7 +95,7 @@ class ImageClassifier(object):
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
             #self.optimizer.param_groups[0]['clipping'] = self.optimizer.param_groups[0]['clipping']*2  if self.bs>64 or self.curr_epoch==self.final_epoch-2 else 0.64
-            self.bs = self.bs//2 if self.bs>64 or self.curr_epoch==self.final_epoch-2 else 64
+            self.bs = self.bs//2 if self.bs>256 or self.curr_epoch==self.final_epoch-2 else 256
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
@@ -194,7 +194,7 @@ class ImageClassifier(object):
     def RA_Helper(self, x, i, j, idx):
         if idx==0:
             torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/{}_Before_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
-        for _ in range(3 - i):
+        for _ in range(2 - i):
             x = RandAugment()(x)
         if idx==0:
             torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/{}_After_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
