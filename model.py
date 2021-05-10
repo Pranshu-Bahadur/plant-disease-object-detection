@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": AGC(model_params.parameters(), SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=2e-05, nesterov=True, momentum=0.9) #,###
+                      "SGDAGC": AGC(model_params.parameters(), SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=2e-05, nesterov=True, momentum=0.9) #,###
         }
         return optim_dict[name]
     
@@ -104,7 +104,8 @@ class ImageClassifier(object):
                 x_ = []
                 for i in range(3):
                     if x[y==i].size(0) > 0:
-                        x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
+                        for _ in range(2):
+                            x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
                 x_ = torch.cat(x_, dim=0)
                 x = x_[torch.randperm(x_.size(0))]
                 print(x.size())
@@ -194,7 +195,7 @@ class ImageClassifier(object):
     def RA_Helper(self, x, i, j, idx):
         if idx==0:
             torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/{}_Before_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
-        for _ in range(2 - i):
+        for _ in range(3 - i):
             x = RandAugment()(x)
         if idx==0:
             torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/{}_After_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
