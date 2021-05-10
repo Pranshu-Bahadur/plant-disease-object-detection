@@ -110,8 +110,9 @@ class ImageClassifier(object):
                                 y_.append(y[y==i])
                         else:
                         """
-                        x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
-                        y_.append(y[y==i])
+                        for _ in range(4):
+                            x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
+                            y_.append(y[y==i])
                 x_ = torch.cat(x_, dim=0)
                 shuffle_seed = torch.randperm(x_.size(0))
                 x = x_[shuffle_seed]
