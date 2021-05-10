@@ -94,8 +94,8 @@ class ImageClassifier(object):
         if train: #and (self.curr_epoch+1)%5==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-            self.optimizer.param_groups[0]['clipping'] = self.optimizer.param_groups[0]['clipping']*2 if self.bs>128 else 0.64
-            self.bs = self.bs//2 if self.bs>32 or self.curr_epoch==self.final_epoch-2 else 32
+            self.optimizer.param_groups[0]['clipping'] = self.optimizer.param_groups[0]['clipping']*2 if self.bs>16 else 2.56
+            self.bs = self.bs//2 if self.bs>16 or self.curr_epoch==self.final_epoch-2 else 16
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
