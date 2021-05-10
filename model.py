@@ -103,7 +103,7 @@ class ImageClassifier(object):
             if train:
                 x = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter)) for img in x])
                 print(x.size())
-                if type(self.optimizer) == SAMSGD or AGC:
+                if type(self.optimizer) == SAMSGD or type(self.optimizer) == AGC:
                     def closure():
                         self.optimizer.zero_grad()
                         preds = self.model(x.cuda())
