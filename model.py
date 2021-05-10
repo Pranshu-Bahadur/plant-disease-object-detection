@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, clipping=0.005) #, weight_decay=2e-05, nesterov=True, momentum=0.9,##AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr), model=model_params, ignore_agc=['head'], clipping=0.04)#
+                      "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, clipping=0.08) #, weight_decay=2e-05, nesterov=True, momentum=0.9,##AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr), model=model_params, ignore_agc=['head'], clipping=0.04)#
         }
         return optim_dict[name]
     
@@ -94,7 +94,7 @@ class ImageClassifier(object):
         if train: #and (self.curr_epoch+1)%5==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-            self.optimizer.param_groups[0]['clipping'] = self.optimizer.param_groups[0]['clipping']*2 if self.bs>16 else 0.08
+            self.optimizer.param_groups[0]['clipping'] = self.optimizer.param_groups[0]['clipping']*2 if self.bs>16 else 0.64
             self.bs = self.bs//2 if self.bs>16 or self.curr_epoch==self.final_epoch-2 else 16
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
