@@ -33,7 +33,7 @@ class ImageClassifier(object):
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
         self.resolution = config["resolution"]
-        self.counter = 4
+        self.counter = 3
         self.final_epoch = config["epochs"]
         print("Generated model: {}".format(self.name))
 
@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, momentum=0.9, nesterov=True, clipping=0.32, weight_decay=1e-5)
+                      "SGDAGC": AGC(model_params.parameters(), SGDSAM(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#
         }
         return optim_dict[name]
     
@@ -94,7 +94,7 @@ class ImageClassifier(object):
         if train: #and (self.curr_epoch+1)%5==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-            self.bs = self.bs//2 if self.bs>16 else 16
+            self.bs = self.bs//2 if self.bs>128 else 128
             #self.optimizer.clipping *= 2 if self.bs>128 else 
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
