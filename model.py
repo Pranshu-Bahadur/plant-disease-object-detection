@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, clipping=0.32, nesterov=True, momentum=0.9) #, weight_decay=2e-05, nesterov=True, momentum=0.9,##AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr), model=model_params, ignore_agc=['head'], clipping=0.04)#
+                      "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, clipping=0.16, nesterov=True, momentum=0.9) #, weight_decay=2e-05, nesterov=True, momentum=0.9,##AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr), model=model_params, ignore_agc=['head'], clipping=0.04)#
         }
         return optim_dict[name]
     
@@ -94,8 +94,8 @@ class ImageClassifier(object):
         if train: #and (self.curr_epoch+1)%5==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-            self.optimizer.param_groups[0]['clipping'] = self.optimizer.param_groups[0]['clipping']*2  if self.bs>16 or self.curr_epoch==self.final_epoch-2 else 2.56
-            self.bs = self.bs//2 if self.bs>16 or self.curr_epoch==self.final_epoch-2 else 16
+            self.optimizer.param_groups[0]['clipping'] = self.optimizer.param_groups[0]['clipping']*2  if self.bs>64 or self.curr_epoch==self.final_epoch-2 else 0.64
+            self.bs = self.bs//2 if self.bs>64 or self.curr_epoch==self.final_epoch-2 else 64
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
@@ -103,7 +103,8 @@ class ImageClassifier(object):
             if train:
                 x_ = []
                 for i in range(3):
-                    x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
+                    if x[y==i].size(0) > 0:
+                        x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
                 x_ = torch.cat(x_, dim=0)
                 x = x_[torch.randperm(x_.size(0))]
                 print(x.size())
@@ -193,7 +194,7 @@ class ImageClassifier(object):
     def RA_Helper(self, x, i, j, idx):
         if idx==0:
             torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/{}_Before_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
-        for _ in range(4 - i):
+        for _ in range(3 - i):
             x = RandAugment()(x)
         if idx==0:
             torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/{}_After_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
