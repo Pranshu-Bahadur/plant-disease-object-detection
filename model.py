@@ -104,7 +104,7 @@ class ImageClassifier(object):
                 x_ = []
                 for i in range(3):
                     x_.append(torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i])
-                x_ = x_.shuffle()
+                x_ = np.shuffle(x_)
                 x = torch.stack(x_)
                 print(x.size())
                     #torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
