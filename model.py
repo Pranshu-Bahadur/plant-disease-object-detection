@@ -151,6 +151,7 @@ class ImageClassifier(object):
                     _, p = torch.max(op, 1)
                     preds_cfm.append(p)
                 #self.writer.add_graph(self.model.cuda(), x.cuda())
+                x = x[torch.randperm(x.size(0))]
                 preds = self.model(x.cuda())
                 loss = self.criterion(preds, y.cuda())
                 probs = nn.functional.softmax(preds, 1)
