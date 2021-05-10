@@ -104,9 +104,9 @@ class ImageClassifier(object):
                 x_, y_ = [], []
                 for i in range(3):
                     if x[y==i].size(0) > 0:
-                        for _ in range(2):
-                            x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
-                            y_.append(y[y==i])
+                        #for _ in range(2):
+                        x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
+                        y_.append(y[y==i])
                 x_ = torch.cat(x_, dim=0)
                 shuffle_seed = torch.randperm(x_.size(0))
                 x = x_[shuffle_seed]
@@ -122,12 +122,15 @@ class ImageClassifier(object):
                         return loss
                     preds = self.model(x.cuda())
                     #self.optimizer.zero_grad()
-                    loss = self.optimizer.step(closure)
+                    #loss = self.optimizer.step(closure)
+                    loss = self.criterion(preds, y.cuda())
+                    loss.backward()
+                    self.optimizer.step()
 
                 #else:
                     if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
-                        inputs = x.to('cpu')
+                        #inputs = x.to('cpu')
                     #inputs = torchvision.transforms.functional.adjust_contrast(inputs, 1.25)
 
                         classes.append(y.to('cpu'))
@@ -137,9 +140,7 @@ class ImageClassifier(object):
                     #self.optimizer.zero_grad()
                     #preds = self.model(x.cuda())
                     #preds = torch.nn.functional.dropout2d(preds,0.4)
-                    #loss = self.criterion(preds, y.cuda())
-                    #loss.backward()
-                    #self.optimizer.step()
+                    #
                 self.scheduler.step()
                 probs = nn.functional.softmax(preds, 1)
                 y_ = torch.argmax(probs, dim=1)
@@ -156,7 +157,9 @@ class ImageClassifier(object):
                     _, p = torch.max(op, 1)
                     preds_cfm.append(p)
                 #self.writer.add_graph(self.model.cuda(), x.cuda())
-                x = x[torch.randperm(x.size(0))]
+                shuffle_seed = torch.randperm(x.size(0))
+                x = x[shuffle_seed]
+                y = y[shuffle_seed]
                 preds = self.model(x.cuda())
                 loss = self.criterion(preds, y.cuda())
                 probs = nn.functional.softmax(preds, 1)
