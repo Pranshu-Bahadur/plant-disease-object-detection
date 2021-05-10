@@ -102,7 +102,7 @@ class ImageClassifier(object):
             total += y.size(0)
             if train:
                 for i in range(3):
-                    x[y==i] = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i)) for img in x[y==i]])
+                    x[y==i] = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]])
                 print(x.size())
                     #torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
                 if type(self.optimizer) == SAMSGD: #or type(self.optimizer) == AGC:
@@ -186,9 +186,11 @@ class ImageClassifier(object):
     def _update_tensorboard(self):
         pass
 
-    def RA_Helper(self, x, i, j):
-        torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "../content/Before_RA_{}_{}.png".format(self.resolution - 32*self.counter, j))
+    def RA_Helper(self, x, i, j, idx):
+        if idx==0:
+            torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/Before_RA_{}_{}.png".format(self.resolution - 32*self.counter, j))
         for _ in range(3 - i):
             x = RandAugment()(x)
-        torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "../content/After_RA_{}_{}.png".format(self.resolution - 32*self.counter, j))
+        if idx==0:
+            torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/After_RA_{}_{}.png".format(self.resolution - 32*self.counter, j))
         return x
