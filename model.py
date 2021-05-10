@@ -210,9 +210,9 @@ class ImageClassifier(object):
     def RA_Helper(self, x, i, j, idx):
         if idx==0:
             torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/{}_Before_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
-        for k in range(3 - i):
-            if k!=2:
-                x = RandAugment()(x)
+        #for k in range(3 - i):
+        #    if k!=2:
+        x = RandAugment()(x)
         if idx==0:
             torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/{}_After_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
         return x
