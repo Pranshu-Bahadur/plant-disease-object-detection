@@ -99,7 +99,6 @@ class ImageClassifier(object):
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
-            total += y.size(0)
             if train:
                 x_, y_ = [], []
                 for i in range(3):
@@ -111,6 +110,8 @@ class ImageClassifier(object):
                 shuffle_seed = torch.randperm(x_.size(0))
                 x = x_[shuffle_seed]
                 y = torch.cat(y_, dim=0)[shuffle_seed]
+                total += y.size(0)
+
                 print(x.size())
                     #torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
                 if type(self.optimizer) == SAMSGD or type(self.optimizer) == AGC:
@@ -160,6 +161,8 @@ class ImageClassifier(object):
                 shuffle_seed = torch.randperm(x.size(0))
                 x = x[shuffle_seed]
                 y = y[shuffle_seed]
+                total += y.size(0)
+
                 preds = self.model(x.cuda())
                 loss = self.criterion(preds, y.cuda())
                 probs = nn.functional.softmax(preds, 1)
