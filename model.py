@@ -94,7 +94,7 @@ class ImageClassifier(object):
         if train: #and (self.curr_epoch+1)%5==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-            #self.bs = self.bs//2 if self.bs>128 else 128
+            self.bs = self.bs//2 if self.bs>32 else 32
             #self.optimizer.clipping *= 2 if self.bs>128 else 
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
@@ -113,16 +113,17 @@ class ImageClassifier(object):
                     preds = self.model(x.cuda())
                     self.optimizer.zero_grad()
                     loss = self.optimizer.step(closure)
-                if self.curr_epoch==self.final_epoch:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
+
+                else:
+                    if self.curr_epoch==self.final_epoch:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
-                    inputs = x.to('cpu')
+                        inputs = x.to('cpu')
                     #inputs = torchvision.transforms.functional.adjust_contrast(inputs, 1.25)
 
-                    classes.append(y.to('cpu'))
-                    op = self.model(inputs)
-                    _, p = torch.max(op, 1)
-                    preds_cfm.append(p)
-                else:
+                        classes.append(y.to('cpu'))
+                        op = self.model(inputs)
+                        _, p = torch.max(op, 1)
+                        preds_cfm.append(p)
                     self.optimizer.zero_grad()
                     preds = self.model(x.cuda())
                     #preds = torch.nn.functional.dropout2d(preds,0.4)
@@ -184,6 +185,6 @@ class ImageClassifier(object):
         pass
 
     def RA_Helper(self, x, i):
-        for _ in range(4 - i):
+        for _ in range(3 - i):
             x = RandAugment()(x)
         return x
