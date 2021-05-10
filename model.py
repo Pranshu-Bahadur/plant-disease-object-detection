@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01) #, weight_decay=2e-05, nesterov=True, momentum=0.9,#AGC(model_params.parameters(), SAMSGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#
+                      "SGDAGC": AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr), model=model_params, ignore_agc=['head'], clipping=0.04)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.04) #, weight_decay=2e-05, nesterov=True, momentum=0.9,##
         }
         return optim_dict[name]
     
@@ -95,7 +95,7 @@ class ImageClassifier(object):
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
             self.bs = self.bs//2 if self.bs>128 else 128
-            #self.optimizer.param_groups[0]['clipping'] *= 2 if self.bs>128 else 0.32
+            self.optimizer.clipping *= 2 if self.bs>128 else 0.32
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
@@ -103,7 +103,7 @@ class ImageClassifier(object):
             if train:
                 x = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter)) for img in x])
                 print(x.size())
-                if type(self.optimizer) == SAMSGD or type(self.optimizer) == AGC:
+                if type(self.optimizer) == SAMSGD: #or type(self.optimizer) == AGC:
                     def closure():
                         self.optimizer.zero_grad()
                         preds = self.model(x.cuda())
