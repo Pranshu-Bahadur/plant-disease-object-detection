@@ -95,19 +95,22 @@ class ImageClassifier(object):
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
             #self.optimizer.clipping = self.optimizer.clipping*2  if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 0.32
-            self.bs = self.bs//2 if self.bs>64 else 64
+            self.bs = self.bs//2 if self.bs>32 else 32
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
             total += y.size(0)
             if train:
-                x_ = []
+                x_, y_ = [], []
                 for i in range(3):
                     if x[y==i].size(0) > 0:
                         for _ in range(2):
                             x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
+                            y_.append(y[y==i])
                 x_ = torch.cat(x_, dim=0)
-                x = x_[torch.randperm(x_.size(0))]
+                shuffle_seed = torch.randperm(x_.size(0))
+                x = x_[shuffle_seed]
+                y = torc.cat(y_, dim=0)[shuffle_seed]
                 print(x.size())
                     #torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
                 if type(self.optimizer) == SAMSGD or type(self.optimizer) == AGC:
