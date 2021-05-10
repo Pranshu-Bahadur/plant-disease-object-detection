@@ -95,13 +95,13 @@ class ImageClassifier(object):
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
             self.optimizer.param_groups[0]['clipping'] = self.optimizer.param_groups[0]['clipping']*2 if self.bs>128 else 0.32
-            self.bs = self.bs//2 if self.bs>128 else 128
+            self.bs = self.bs//2 if self.bs>128 or self.curr_epoch==self.final_epoch-1 else 128
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
             total += y.size(0)
             if train:
-                x = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter)) for img in x])
+                x = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, y)) for img in x])
                 print(x.size())
                 for i in range(3):
                     torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
@@ -186,7 +186,7 @@ class ImageClassifier(object):
     def _update_tensorboard(self):
         pass
 
-    def RA_Helper(self, x, i):
+    def RA_Helper(self, x, i, y):
         for i in range(3):
             torchvision.utils.save_image(x[y==i][0], "/content/Before_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
         for _ in range(3 - i):
