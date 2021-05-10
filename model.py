@@ -187,8 +187,8 @@ class ImageClassifier(object):
         pass
 
     def RA_Helper(self, x, i, y):
-        torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/content/Before_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
+        torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "content/Before_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
         for _ in range(3 - i):
             x = RandAugment()(x)
-        torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/content/After_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
+        torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "content/After_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
         return x
