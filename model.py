@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=2e-05, nesterov=True, momentum=0.9) #,###
+                      "SGDAGC": AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.64)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=2e-05, nesterov=True, momentum=0.9) #,###
         }
         return optim_dict[name]
     
@@ -95,7 +95,7 @@ class ImageClassifier(object):
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
             #self.optimizer.clipping = self.optimizer.clipping*2  if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 0.32
-            self.bs = self.bs//2 if self.bs>64 else 64
+            #self.bs = self.bs//2 if self.bs>64 else 64
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
@@ -103,7 +103,7 @@ class ImageClassifier(object):
                 x_, y_ = [], []
                 for i in range(3):
                     if x[y==i].size(0) > 0:
-                        for _ in range(2):
+                        for _ in range(4):
                             x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
                             y_.append(y[y==i])
                 x_ = torch.cat(x_, dim=0)
@@ -174,7 +174,7 @@ class ImageClassifier(object):
             torch.cuda.empty_cache()
         if self.curr_epoch==self.final_epoch-1:
             classes.pop()
-            preds.pop()
+            preds_cfm.pop()
             classes = torch.stack(classes, dim=0).view(-1)
             preds_cfm = torch.stack(preds_cfm, dim=0).view(-1)
             print(classes.size(), preds.size())
