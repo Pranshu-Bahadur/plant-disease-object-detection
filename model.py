@@ -128,7 +128,7 @@ class ImageClassifier(object):
                     preds = self.model(x.cuda())
                     #preds = torch.nn.functional.dropout2d(preds,0.4)
                     loss = self.criterion(preds, y.cuda())
-                    oss.backward()
+                    loss.backward()
                     self.optimizer.step()
                 self.scheduler.step()
                 probs = nn.functional.softmax(preds, 1)
