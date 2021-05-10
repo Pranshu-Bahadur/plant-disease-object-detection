@@ -95,7 +95,7 @@ class ImageClassifier(object):
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
             #self.optimizer.clipping = self.optimizer.clipping*2  if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 0.32
-            self.bs = self.bs//2 if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 128
+            self.bs = self.bs//2 if self.bs>128 else 128
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
@@ -127,16 +127,16 @@ class ImageClassifier(object):
                     #inputs = torchvision.transforms.functional.adjust_contrast(inputs, 1.25)
 
                         classes.append(y.to('cpu'))
-                        op = self.model(inputs)
-                        _, p = torch.max(op, 1)
+                        #op = self.model(inputs)
+                        _, p = torch.max(preds, 1)
                         preds_cfm.append(p)
-                    self.optimizer.zero_grad()
+                    #self.optimizer.zero_grad()
                     #preds = self.model(x.cuda())
                     #preds = torch.nn.functional.dropout2d(preds,0.4)
                     #loss = self.criterion(preds, y.cuda())
                     #loss.backward()
                     #self.optimizer.step()
-                self.scheduler.step()
+                #self.scheduler.step()
                 probs = nn.functional.softmax(preds, 1)
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
