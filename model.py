@@ -109,7 +109,7 @@ class ImageClassifier(object):
                 x = x_[torch.randperm(x_.size(0))]
                 print(x.size())
                     #torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
-                if type(self.optimizer) == SAMSGD: #or type(self.optimizer) == AGC:
+                if type(self.optimizer) == SAMSGD or type(self.optimizer) == AGC:
                     def closure():
                         self.optimizer.zero_grad()
                         preds = self.model(x.cuda())
