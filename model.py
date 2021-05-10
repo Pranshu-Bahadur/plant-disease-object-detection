@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": AGC(model_params.parameters(), SAMSGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.08)#
+                      "SGDAGC": AGC(model_params.parameters(), SAMSGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#
         }
         return optim_dict[name]
     
@@ -95,7 +95,7 @@ class ImageClassifier(object):
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
             self.bs = self.bs//2 if self.bs>32 else 32
-            self.optimizer.clipping *= 2 if self.bs>32 else 0.64
+            #self.optimizer.clipping *= 2 if self.bs>32 else 0.64
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
