@@ -94,14 +94,14 @@ class ImageClassifier(object):
         if train: #and (self.curr_epoch+1)%5==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
-            self.bs = self.bs//2 if self.bs>128 else 128
+            self.bs = self.bs//2 if self.bs>64 else 64
             #self.optimizer.clipping *= 2 if self.bs>128 else 
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
             total += y.size(0)
             if train:
-                x = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 64*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter)) for img in x])
+                x = torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter)) for img in x])
                 print(x.size())
                 if type(self.optimizer) == SAMSGD:
                     def closure():
