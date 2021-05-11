@@ -91,11 +91,13 @@ class ImageClassifier(object):
         running_loss, correct, total, iterations = 0, 0, 0, 0
         classes = []
         preds_cfm = []
+        """
         if train: #and (self.curr_epoch+1)%5==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
             #self.optimizer.clipping = self.optimizer.clipping*2  if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 0.32
             #self.bs = self.bs//2 if self.bs>64 else 64
+        """
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
@@ -116,7 +118,7 @@ class ImageClassifier(object):
                 """
                 shuffle_seed = torch.randperm(x.size(0))
                 x = x[shuffle_seed]
-                y = torch.cat(y_, dim=0)[shuffle_seed]
+                y = torch.cat(y, dim=0)[shuffle_seed]
                 total += y.size(0)
 
                 print(x.size())
