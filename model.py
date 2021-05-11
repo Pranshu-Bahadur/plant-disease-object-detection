@@ -103,12 +103,12 @@ class ImageClassifier(object):
                 x_, y_ = [], []
                 for i in range(3):
                     if x[y==i].size(0) > 0:
-                        if i==2:
-                            for _ in range(4):
-                                x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
-                                y_.append(y[y==i])
-                        else:
-                        #for _ in range(2):
+                        #if i==2:
+                        #    for _ in range(4):
+                        #        x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
+                        #        y_.append(y[y==i])
+                        #else:
+                        for _ in range(4):
                             x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
                             y_.append(y[y==i])
                 x_ = torch.cat(x_, dim=0)
