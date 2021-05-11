@@ -50,7 +50,7 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      #"SGDAGC": AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=2e-05, nesterov=True, momentum=0.9) #,###
+                      "SGDAGC": AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=2e-05, nesterov=True, momentum=0.9) #,###
         }
         return optim_dict[name]
     
@@ -80,7 +80,7 @@ class ImageClassifier(object):
     def _run_epoch(self, split):
         self.model.train()
         train_acc, train_loss = self._train_or_eval(split[0], True)
-        #self.model.eval()
+        self.model.eval()
         with torch.no_grad():
             val_acc, val_loss = self._train_or_eval(split[1], False)
         print(train_acc, train_loss, val_acc, val_loss)
@@ -91,18 +91,15 @@ class ImageClassifier(object):
         running_loss, correct, total, iterations = 0, 0, 0, 0
         classes = []
         preds_cfm = []
-        """
         if train: #and (self.curr_epoch+1)%5==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
             #self.optimizer.clipping = self.optimizer.clipping*2  if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 0.32
             #self.bs = self.bs//2 if self.bs>64 else 64
-        """
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data
             if train:
-                """
                 x_, y_ = [], []
                 for i in range(3):
                     if x[y==i].size(0) > 0:
@@ -112,18 +109,21 @@ class ImageClassifier(object):
                         #        y_.append(y[y==i])
                         #else:
                         #for _ in range(4):
-                        x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
-                        y_.append(y[y==i])
+                        if self.counter > 0:
+                            x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
+                            y_.append(y[y==i])
+                        else:
+                            x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.ToPILImage()(img), self.counter, i, idx)) for img in x[y==i]]))
+                            y_.append(y[y==i])
                 x_ = torch.cat(x_, dim=0)
-                """
-                shuffle_seed = torch.randperm(x.size(0))
-                x = x[shuffle_seed]
-                y = y[shuffle_seed]
+                shuffle_seed = torch.randperm(x_.size(0))
+                x = x_[shuffle_seed]
+                y = torch.cat(y_, dim=0)[shuffle_seed]
                 total += y.size(0)
 
                 print(x.size())
                     #torchvision.utils.save_image(x[y==i][0], "/content/Post_RA_{}_{}.png".format(self.resolution - 32*self.counter, i))
-                if True:
+                if type(self.optimizer) == SAMSGD or type(self.optimizer) == AGC:
                     def closure():
                         self.optimizer.zero_grad()
                         preds = self.model(x.cuda())
@@ -138,7 +138,6 @@ class ImageClassifier(object):
                     self.optimizer.step()
 
                 #else:
-                    """
                     if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
                         #inputs = x.to('cpu')
@@ -148,7 +147,6 @@ class ImageClassifier(object):
                         #op = self.model(inputs)
                         _, p = torch.max(preds, 1)
                         preds_cfm.append(p)
-                    """
                     #self.optimizer.zero_grad()
                     #preds = self.model(x.cuda())
                     #preds = torch.nn.functional.dropout2d(preds,0.4)
@@ -159,7 +157,6 @@ class ImageClassifier(object):
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 print(idx, (correct/total)*100, loss.cpu().item())
             else:
-                """
                 if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
                     inputs = x.to('cpu')
@@ -170,7 +167,6 @@ class ImageClassifier(object):
                     _, p = torch.max(op, 1)
                     preds_cfm.append(p)
                 #self.writer.add_graph(self.model.cuda(), x.cuda())
-                """
                 shuffle_seed = torch.randperm(x.size(0))
                 x = x[shuffle_seed]
                 y = y[shuffle_seed]
@@ -185,20 +181,19 @@ class ImageClassifier(object):
             iterations += 1
             del x, y
             torch.cuda.empty_cache()
-        """
         if self.curr_epoch==self.final_epoch-1:
             classes.pop()
             preds_cfm.pop()
             classes = torch.stack(classes, dim=0).view(-1)
             preds_cfm = torch.stack(preds_cfm, dim=0).view(-1)
-            print(classes.size(), preds.size())
+            #print(classes.size(), preds.size())
             cfm = confusion_matrix(classes.cpu().detach().numpy(),preds_cfm.cpu().detach().numpy())
             classes=["0","1","2"]
             df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
             plt.figure(figsize=(5,5))
             cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
             cfm_plot.figure.savefig('/home/fraulty/ws/RP_TBX11K/content/cfmtbx_{}.png'.format("train" if train else "validation"))
-        """
+
         return float(correct/float(total))*100, float(running_loss/iterations)
 
     def _test(self, loader):
