@@ -112,8 +112,8 @@ class ImageClassifier(object):
                                     x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.ToPILImage()(img), self.counter, i, idx)) for img in x[y==i]]))
                                     y_.append(y[y==i])
                         
-                        #else:
-                        for _ in range(2):
+                        else:
+                        #for _ in range(2):
                             if self.counter > 0:
                                 x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
                                 y_.append(y[y==i])
