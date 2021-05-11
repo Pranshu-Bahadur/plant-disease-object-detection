@@ -98,7 +98,7 @@ class ImageClassifier(object):
             #self.bs = self.bs//2 if self.bs>64 else 64
         for idx, data in enumerate(loader):
             self.optimizer.zero_grad()
-            x, y = data.cuda()
+            x, y = data
             if train:
                 x_, y_ = [], []
                 for i in range(3):
