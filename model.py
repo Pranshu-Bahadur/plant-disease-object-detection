@@ -118,7 +118,7 @@ class ImageClassifier(object):
                 """
                 shuffle_seed = torch.randperm(x.size(0))
                 x = x[shuffle_seed]
-                y = torch.cat(y, dim=0)[shuffle_seed]
+                y = y[shuffle_seed]
                 total += y.size(0)
 
                 print(x.size())
