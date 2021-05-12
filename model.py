@@ -221,6 +221,6 @@ class ImageClassifier(object):
         for k in range(3 - i):
             if k<2:
                 x = RandAugment()(x)
-        if idx==0 and self.curr_epoch<2:
+        if idx==0 and self.curr_epoch<1:
             torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/content/{}_After_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
         return x
