@@ -193,9 +193,9 @@ class ImageClassifier(object):
             preds_cfm = torch.stack(preds_cfm, dim=0).view(-1)
             #print(classes.size(), preds.size())
             cfm = confusion_matrix(classes.cpu().detach().numpy(),preds_cfm.cpu().detach().numpy())
-            classes=["0","1","2"]
+            classes=[str(i) for i in range(38)]
             df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
-            plt.figure(figsize=(5,5))
+            plt.figure(figsize=(15,15))
             cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
             cfm_plot.figure.savefig('/home/fraulty/ws/content/cfmtbx_{}.png'.format("train" if train else "validation"))
 
