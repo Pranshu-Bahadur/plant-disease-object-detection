@@ -197,7 +197,7 @@ class ImageClassifier(object):
             df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
             plt.figure(figsize=(5,5))
             cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
-            cfm_plot.figure.savefig('/home/fraulty/ws/RP_TBX11K/content/cfmtbx_{}.png'.format("train" if train else "validation"))
+            cfm_plot.figure.savefig('/home/fraulty/ws/content/cfmtbx_{}.png'.format("train" if train else "validation"))
 
         return float(correct/float(total))*100, float(running_loss/iterations)
 
@@ -217,10 +217,10 @@ class ImageClassifier(object):
 
     def RA_Helper(self, x, i, j, idx):
         if idx==0 and self.curr_epoch<3:
-            torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/{}_Before_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
+            torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/content/{}_Before_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
         for k in range(3 - i):
             if k<2:
                 x = RandAugment()(x)
         if idx==0 and self.curr_epoch<3:
-            torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/RP_TBX11K/content/{}_After_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
+            torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/content/{}_After_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
         return x
