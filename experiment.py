@@ -53,17 +53,17 @@ class Experiment(object):
         #mean_sum = [0.5675, 0.5675, 0.5675]
         #std_sum = [0.2157, 0.2157, 0.2157]
         transformations = [
-            transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
+            #transforms.Resize([resolution, resolution], PIL.Image.ANTIALIAS),
             #RandAugment(),
             #RandAugment(),
             #RandAugment(),
             #RandAugment(),
-            transforms.Grayscale(3),
+            #transforms.Grayscale(3),
             transforms.ToTensor(),
             #transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
         transformations = transforms.Compose(transformations)
-        dataSetFolder = ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#torchvision.datasets.ImageFolder(root=directory, transform=transformations)
+        dataSetFolder = torchvision.datasets.ImageFolder(root=directory, transform=transformations)#ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#
         if train:
             trainingValidationDatasetSize = int(0.7 * len(dataSetFolder))
             testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)
