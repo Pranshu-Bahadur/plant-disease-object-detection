@@ -101,7 +101,7 @@ class ImageClassifier(object):
             x, y = data
             if train:
                 x_, y_ = [], []
-                for i in range(3):
+                for i in range(38):
                     if x[y==i].size(0) > 0:
                         #if i==2:
                             #for _ in range(2):
