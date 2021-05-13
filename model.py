@@ -80,6 +80,16 @@ class ImageClassifier(object):
 
     def _run_epoch(self, split):
         self.model.train()
+        transforms = [
+            torchvision.transforms.ToPILImage(),
+            torchvision.transforms.ToTensor()
+            ]
+        for i in range(4-self.counter):
+            if i < 2:
+                transforms.insert(1, RandAugment())
+        transforms = torchvision.transforms.Compose(transforms)
+
+        split[0] = list(map(lambda idx, x: torch.stack(list(map(lambda img: transforms(img), x[0]))),enumerate(split[0])))
         train_acc, train_loss = self._train_or_eval(split[0], True)
         self.model.eval()
         with torch.no_grad():
@@ -97,7 +107,7 @@ class ImageClassifier(object):
             print("Changing resolution...")
             #self.optimizer.clipping = self.optimizer.clipping*2  if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 0.32
             #self.bs = self.bs//2 if self.bs>64 else 64
-        for idx, data in enumerate(loader):
+        for idx, data in loader:
             self.optimizer.zero_grad()
             x, y = data
             if train:
@@ -127,11 +137,11 @@ class ImageClassifier(object):
                 x_ = torch.cat(x_, dim=0)
                 """
                 #shuffle_seed = torch.randperm(x.size(0))
-                x = x.cuda()
+                #x = x.cuda()
                 #if self.counter > 0:
                 #    x = torchvision.transforms.functional.resize(x, self.resolution-32*self.counter)
-                x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
-                x = torch.stack(x)
+                #x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
+                #x = torch.stack(x)
                 #x = x[shuffle_seed]
                 #y = y[shuffle_seed]#torch.cat(y_, dim=0)
                 total += y.size(0)
