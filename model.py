@@ -90,7 +90,7 @@ class ImageClassifier(object):
         transforms = torchvision.transforms.Compose(transforms)
 
         split[0] = list(map(lambda x: torch.stack(list(map(lambda img: transforms(img), x[0]))),list(split[0])))
-        print(len(split[0]), print(split[0][0].size()))
+        #print(len(split[0]), print(split[0][0].size()))
         train_acc, train_loss = self._train_or_eval(split[0], True)
         self.model.eval()
         with torch.no_grad():
@@ -108,7 +108,7 @@ class ImageClassifier(object):
             print("Changing resolution...")
             #self.optimizer.clipping = self.optimizer.clipping*2  if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 0.32
             #self.bs = self.bs//2 if self.bs>64 else 64
-        for idx, data in loader:
+        for data in loader:
             self.optimizer.zero_grad()
             x, y = data
             if train:
