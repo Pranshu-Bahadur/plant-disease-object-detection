@@ -85,7 +85,7 @@ class ImageClassifier(object):
             torchvision.transforms.ToTensor()
             ]
         if self.counter-1 > 0:
-            transforms.insert(0, torchvision.transforms.Resize(self.resolution - 32*self.counter-1))
+            transforms.insert(1, torchvision.transforms.Resize(self.resolution - 32*self.counter-1))
         for i in range(4-self.counter):
             if i < 2:
                 transforms.insert(1, RandAugment())
