@@ -4,8 +4,8 @@ from experiment import Experiment
 from torch.utils.data import DataLoader as Loader
 from torchvision import transforms as transforms
 import PIL
-from util import ImageFilelist
-
+from util import ImageFilelist, RandAugmentGrid
+from torchvision.datasets import ImageFolder
 
 def _model_config(args):
     config = {
@@ -25,7 +25,8 @@ def _model_config(args):
         "save_interval": int(args.save_interval),
         "library": args.library,
         "save_directory": args.save_directory,
-        "list": args.list
+        "list": args.list,
+        
     }
     return config
 
@@ -71,6 +72,8 @@ if __name__ == "__main__":
     parser.add_argument("--save_interval")
     parser.add_argument("--pretrained", action="store_true")
     parser.add_argument("--opMode", action="store_true")
+    parser.add_argument("--ra_grid", action="store_true")
+
 
     args = parser.parse_args()
     config = _model_config(args)
@@ -87,6 +90,9 @@ if __name__ == "__main__":
         _tbx11k_output(experiment.classifier, testLoader)
     elif args.train:
         experiment._run(args.dataset_directory, config)
+    elif args.ra_grid:
+        dataset = ImageFolder(root=args.dataset_directory)
+        RandAugmentGrid()(dataset[0][0])
     else:
         dataset = experiment._preprocessing(args.dataset_directory, args.list, config["resolution"], False)
         loader = Loader(dataset, experiment.classifier.bs, shuffle=False, num_workers=4)
