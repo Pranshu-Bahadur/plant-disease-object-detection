@@ -130,7 +130,7 @@ class ImageClassifier(object):
                 x = x.cuda()
                 if self.counter > 0:
                     x = torchvision.transforms.functional.resize(x, self.resolution-32*self.counter)
-                x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
+                #x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
                 x = torch.stack(x)
                 #x = x[shuffle_seed]
                 #y = y[shuffle_seed]#torch.cat(y_, dim=0)
@@ -171,6 +171,7 @@ class ImageClassifier(object):
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 print(idx, (correct/total)*100, loss.cpu().item())
+
             else:
                 if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
