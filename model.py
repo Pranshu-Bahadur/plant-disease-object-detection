@@ -113,7 +113,7 @@ class ImageClassifier(object):
         idx = 0
         for data in loader if train else enumerate(loader):
             self.optimizer.zero_grad()
-            x, y = data if train else data[0]
+            x, y = data if train else data[1]
             if train:
                 """
                 x_, y_ = [], []
