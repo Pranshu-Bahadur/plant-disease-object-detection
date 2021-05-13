@@ -263,7 +263,7 @@ class RandAugmentGrid:
 
     def __call__(self, img):
         grid = [(SubPolicy(*policy).__repr__(), SubPolicy(*policy)(img)) for policy in self._policies]
-        return [torchvision.utils.save_image(torchvision.transforms.ToTensor()(image),"/home/fraulty/ws/RP_TBX11K/content/{}.png".format(name)) for name, image in grid]
+        return [torchvision.utils.save_image(torchvision.transforms.ToTensor()(image),"/home/fraulty/ws/content/{}.png".format(name)) for name, image in grid]
 
     def __repr__(self):
         return "Random Augment Policy"
