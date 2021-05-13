@@ -127,7 +127,7 @@ class ImageClassifier(object):
                 x_ = torch.cat(x_, dim=0)
                 """
                 shuffle_seed = torch.randperm(x.size(0))
-                x = map(lambda img: torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, 0, idx)), x) 
+                map(lambda img: torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, 0, idx)), x)   
                 x = x[shuffle_seed]
                 y = y[shuffle_seed]#torch.cat(y_, dim=0)
                 total += y.size(0)
