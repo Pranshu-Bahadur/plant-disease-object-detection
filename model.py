@@ -84,6 +84,8 @@ class ImageClassifier(object):
             torchvision.transforms.ToPILImage(),
             torchvision.transforms.ToTensor()
             ]
+        if self.counter-1 > 0:
+            transforms.insert(0, torchvision.transforms.Resize(self.resolution - 32*self.counter-1))
         for i in range(4-self.counter):
             if i < 2:
                 transforms.insert(1, RandAugment())
@@ -108,6 +110,7 @@ class ImageClassifier(object):
             print("Changing resolution...")
             #self.optimizer.clipping = self.optimizer.clipping*2  if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 0.32
             #self.bs = self.bs//2 if self.bs>64 else 64
+        idx = 0
         for data in loader if train else enumerate(loader):
             self.optimizer.zero_grad()
             x, y = data if train else data[0]
@@ -182,6 +185,7 @@ class ImageClassifier(object):
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 print(idx, (correct/total)*100, loss.cpu().item())
+                idx += 1
 
             else:
                 if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
