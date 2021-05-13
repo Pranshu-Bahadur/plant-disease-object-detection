@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import DataLoader as Loader
 from randaugment import RandAugment
 import PIL
-from util import ImageFilelistWithLabels
+from util import ImageFilelistWithLabels, collate_fn
 
 class Experiment(object):
     def __init__(self, config: dict):
@@ -63,7 +63,7 @@ class Experiment(object):
             #transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
         transformations = transforms.Compose(transformations)
-        dataSetFolder = torchvision.datasets.ImageFolder(root=directory, transform=transformations)#ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#
+        dataSetFolder = ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#torchvision.datasets.ImageFolder(root=directory, transform=transformations)#
         if train:
             trainingValidationDatasetSize = int(0.7 * len(dataSetFolder))
             testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)

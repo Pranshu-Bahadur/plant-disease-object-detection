@@ -35,6 +35,7 @@ class ImageClassifier(object):
         self.resolution = config["resolution"]
         self.counter = 3
         self.final_epoch = config["epochs"]
+        self.nc = config["num_classes"]
         print("Generated model: {}".format(self.name))
 
         if config["train"] and config["checkpoint"] == "":
@@ -100,8 +101,10 @@ class ImageClassifier(object):
             self.optimizer.zero_grad()
             x, y = data
             if train:
+                """
                 x_, y_ = [], []
-                for i in range(38):
+
+                for i in range(self.nc):
                     if x[y==i].size(0) > 0:
                         #if i==2:
                             #for _ in range(2):
@@ -120,10 +123,13 @@ class ImageClassifier(object):
                         else:
                             x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.ToPILImage()(img), self.counter, i, idx)) for img in x[y==i]]))
                             y_.append(y[y==i])
+                
                 x_ = torch.cat(x_, dim=0)
-                shuffle_seed = torch.randperm(x_.size(0))
-                x = x_[shuffle_seed]
-                y = torch.cat(y_, dim=0)[shuffle_seed]
+                """
+                shuffle_seed = torch.randperm(x.size(0))
+                x = map(lambda img: torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, 0, idx)), x) 
+                x = x[shuffle_seed]
+                y = y[shuffle_seed]#torch.cat(y_, dim=0)
                 total += y.size(0)
 
                 print(x.size())
@@ -193,9 +199,9 @@ class ImageClassifier(object):
             preds_cfm = torch.stack(preds_cfm, dim=0).view(-1)
             #print(classes.size(), preds.size())
             cfm = confusion_matrix(classes.cpu().detach().numpy(),preds_cfm.cpu().detach().numpy())
-            classes=[str(i) for i in range(38)]
+            classes=[str(i) for i in range(self.nc)]
             df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
-            plt.figure(figsize=(15,15))
+            plt.figure(figsize=(5,5))
             cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
             cfm_plot.figure.savefig('/home/fraulty/ws/content/cfmtbx_{}.png'.format("train" if train else "validation"))
 
@@ -216,11 +222,11 @@ class ImageClassifier(object):
         pass
 
     def RA_Helper(self, x, i, j, idx):
+        """
         if idx==0 and self.curr_epoch<2:
             torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/content/{}_Before_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
+        """
         for k in range(3 - i):
             if k<2:
                 x = RandAugment()(x)
-        if idx==0 and self.curr_epoch<1:
-            torchvision.utils.save_image(torchvision.transforms.ToTensor()(x), "/home/fraulty/ws/content/{}_After_RA_{}_{}.png".format(self.curr_epoch+1,self.resolution - 32*self.counter, j))
         return x
