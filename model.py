@@ -198,9 +198,9 @@ class ImageClassifier(object):
                     _, p = torch.max(op, 1)
                     preds_cfm.append(p)
                 #self.writer.add_graph(self.model.cuda(), x.cuda())
-                shuffle_seed = torch.randperm(x.size(0))
-                x = x[shuffle_seed]
-                y = y[shuffle_seed]
+                #shuffle_seed = torch.randperm(x.size(0))
+                #x = x[shuffle_seed]
+                #y = y[shuffle_seed]
                 total += y.size(0)
 
                 preds = self.model(x.cuda())
