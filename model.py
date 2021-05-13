@@ -89,7 +89,7 @@ class ImageClassifier(object):
                 transforms.insert(1, RandAugment())
         transforms = torchvision.transforms.Compose(transforms)
 
-        split[0] = list(map(lambda x: torch.stack(list(map(lambda img: transforms(img), x[0][0]))),list(split[0])))
+        split[0] = list(map(lambda x: torch.stack(list(map(lambda img: transforms(img), x[0]))),list(split[0])))
         print(len(split[0]), print(split[0][0].size()))
         train_acc, train_loss = self._train_or_eval(split[0], True)
         self.model.eval()
