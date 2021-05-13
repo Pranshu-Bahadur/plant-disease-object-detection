@@ -230,7 +230,7 @@ class SubPolicy(object):
         return img
 
     def __repr__(self):
-        return f"{self._operation1_name}_{self.p1}_{self.magnitude1}"# \
+        return f"0_{self._operation1_name}_{self.p1}_{self.magnitude1}"# \
             #f"{self._operation2_name} with p:{self.p2} and magnitude:{self.magnitude2} \n"
 
 

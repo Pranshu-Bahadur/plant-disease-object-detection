@@ -1,3 +1,4 @@
+import torchvision
 import torch
 import argparse
 from experiment import Experiment
@@ -92,6 +93,7 @@ if __name__ == "__main__":
         experiment._run(args.dataset_directory, config)
     elif args.ra_grid:
         dataset = ImageFolder(root=args.dataset_directory)
+        torchvision.utils.save_image(torchvision.transforms.ToTensor()(dataset[0][0]), "0_original_image.png")
         RandAugmentGrid()(dataset[0][0])
     else:
         dataset = experiment._preprocessing(args.dataset_directory, args.list, config["resolution"], False)
