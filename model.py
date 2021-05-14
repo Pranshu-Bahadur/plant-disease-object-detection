@@ -79,8 +79,7 @@ class ImageClassifier(object):
         torch.save(self.model.state_dict(), "{}/./{}.pth".format(directory, name))
 
     def _run_epoch(self, split):
-        self.model.train()
-        """
+        self.model.train()        
         if self.curr_epoch < 2:
             transforms = [
                 torchvision.transforms.ToPILImage(),
@@ -95,10 +94,8 @@ class ImageClassifier(object):
             transforms = torchvision.transforms.Compose(transforms)
 
             split[0] = list(map(lambda x: (torch.stack(list(map(lambda img: transforms(img), x[0]))),x[1]) ,list(split[0])))
-        """
-        if self.curr_epoch==0:
-            split[0] = list(map(lambda x: (x[0],x[1]) ,split[0]))#(torchvision.transforms.functional.resize(x[0], self.resolution)
-        
+        if self.curr_epoch==2:
+            split[0] = list(map(lambda x: (torchvision.transforms.functional.resize(x[0], self.resolution),x[1]) ,split[0]))
         #print(len(split[0]), print(split[0][0].size()))
         train_acc, train_loss = self._train_or_eval(split[0], True)
         self.model.eval()
@@ -149,8 +146,6 @@ class ImageClassifier(object):
                 """
                 
                 #x = x.cuda()
-                if self.curr_epoch == 2:
-                    x = torchvision.transforms.functional.resize(x, self.resolution)
                 #x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
                 #x = torch.stack(x)
                 shuffle_seed = torch.randperm(x.size(0))
@@ -196,6 +191,7 @@ class ImageClassifier(object):
                 idx += 1
 
             else:
+                """
                 if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
                     inputs = x.to('cpu')
@@ -205,6 +201,7 @@ class ImageClassifier(object):
                     op = self.model(inputs)
                     _, p = torch.max(op, 1)
                     preds_cfm.append(p)
+                """
                 #self.writer.add_graph(self.model.cuda(), x.cuda())
                 shuffle_seed = torch.randperm(x.size(0))
                 x = x[shuffle_seed]
@@ -220,6 +217,7 @@ class ImageClassifier(object):
             iterations += 1
             del x, y
             torch.cuda.empty_cache()
+        """
         if self.curr_epoch==self.final_epoch-1:
             classes.pop()
             preds_cfm.pop()
@@ -232,7 +230,7 @@ class ImageClassifier(object):
             plt.figure(figsize=(5,5))
             cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
             cfm_plot.figure.savefig('/home/fraulty/ws/content/cfmtbx_{}.png'.format("train" if train else "validation"))
-
+        """
         return float(correct/float(total))*100, float(running_loss/iterations)
 
     def _test(self, loader):
