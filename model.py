@@ -80,7 +80,7 @@ class ImageClassifier(object):
 
     def _run_epoch(self, split):
         self.model.train()
-        if self.counter > 0:
+        if self.curr_epoch >= 2:
             transforms = [
                 torchvision.transforms.ToPILImage(),
                 torchvision.transforms.ToTensor()
