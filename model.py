@@ -80,18 +80,19 @@ class ImageClassifier(object):
 
     def _run_epoch(self, split):
         self.model.train()
-        transforms = [
-            torchvision.transforms.ToPILImage(),
-            torchvision.transforms.ToTensor()
-            ]
-        if self.counter-1 > 0:
-            transforms.insert(1, torchvision.transforms.Resize(self.resolution - 32*(self.counter-1)))
-        for i in range(4-self.counter):
-            if i < 2:
-                transforms.insert(1, RandAugment())
-        transforms = torchvision.transforms.Compose(transforms)
+        if self.curr_epoch == 0:
+            transforms = [
+                torchvision.transforms.ToPILImage(),
+                torchvision.transforms.ToTensor()
+                ]
+            if self.counter-1 > 0:
+                transforms.insert(1, torchvision.transforms.Resize(self.resolution - 32*(self.counter-1)))
+            for i in range(4-self.counter):
+                if i < 2:
+                    transforms.insert(1, RandAugment())
+            transforms = torchvision.transforms.Compose(transforms)
 
-        split[0] = list(map(lambda x: (torch.stack(list(map(lambda img: transforms(img), x[0]))),x[1]) ,list(split[0])))
+            split[0] = list(map(lambda x: (torch.stack(list(map(lambda img: transforms(img), x[0]))),x[1]) ,list(split[0])))
         #print(len(split[0]), print(split[0][0].size()))
         train_acc, train_loss = self._train_or_eval(split[0], True)
         self.model.eval()
@@ -140,14 +141,14 @@ class ImageClassifier(object):
                 
                 x_ = torch.cat(x_, dim=0)
                 """
-                #shuffle_seed = torch.randperm(x.size(0))
+                shuffle_seed = torch.randperm(x.size(0))
                 #x = x.cuda()
                 #if self.counter > 0:
                 #    x = torchvision.transforms.functional.resize(x, self.resolution-32*self.counter)
                 #x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
                 #x = torch.stack(x)
-                #x = x[shuffle_seed]
-                #y = y[shuffle_seed]#torch.cat(y_, dim=0)
+                x = x[shuffle_seed]
+                y = y[shuffle_seed]#torch.cat(y_, dim=0)
                 total += y.size(0)
 
                 print(x.size())
@@ -198,9 +199,9 @@ class ImageClassifier(object):
                     _, p = torch.max(op, 1)
                     preds_cfm.append(p)
                 #self.writer.add_graph(self.model.cuda(), x.cuda())
-                #shuffle_seed = torch.randperm(x.size(0))
-                #x = x[shuffle_seed]
-                #y = y[shuffle_seed]
+                shuffle_seed = torch.randperm(x.size(0))
+                x = x[shuffle_seed]
+                y = y[shuffle_seed]
                 total += y.size(0)
 
                 preds = self.model(x.cuda())
