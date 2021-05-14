@@ -141,14 +141,14 @@ class ImageClassifier(object):
                 
                 x_ = torch.cat(x_, dim=0)
                 """
-                shuffle_seed = torch.randperm(x.size(0))
+                #shuffle_seed = torch.randperm(x.size(0))
                 #x = x.cuda()
                 if self.curr_epoch == 2:
                     x = torchvision.transforms.functional.resize(x, self.resolution)
                 #x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
                 #x = torch.stack(x)
-                x = x[shuffle_seed]
-                y = y[shuffle_seed]#torch.cat(y_, dim=0)
+                #x = x[shuffle_seed]
+                #y = y[shuffle_seed]#torch.cat(y_, dim=0)
                 total += y.size(0)
 
                 print(x.size())
