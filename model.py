@@ -95,7 +95,7 @@ class ImageClassifier(object):
 
             split[0] = list(map(lambda x: (torch.stack(list(map(lambda img: transforms(img), x[0]))),x[1]) ,list(split[0])))
         if self.curr_epoch==2:
-            split[0] = list(map(lambda x: (torchvision.transforms.functional.resize(x[0], self.resolution),x[1]) ,list(split[0])))
+            split[0] = list(map(lambda x: (torchvision.transforms.functional.resize(x[0], self.resolution),x[1]) ,split[0]))
         #print(len(split[0]), print(split[0][0].size()))
         train_acc, train_loss = self._train_or_eval(split[0], True)
         self.model.eval()
@@ -144,14 +144,15 @@ class ImageClassifier(object):
                 
                 x_ = torch.cat(x_, dim=0)
                 """
-                #shuffle_seed = torch.randperm(x.size(0))
+                
                 #x = x.cuda()
                 if self.curr_epoch == 2:
                     x = torchvision.transforms.functional.resize(x, self.resolution)
                 #x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
                 #x = torch.stack(x)
-                #x = x[shuffle_seed]
-                #y = y[shuffle_seed]#torch.cat(y_, dim=0)
+                shuffle_seed = torch.randperm(x.size(0))
+                x = x[shuffle_seed]
+                y = y[shuffle_seed]#torch.cat(y_, dim=0)
                 total += y.size(0)
 
                 print(x.size())
