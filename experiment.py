@@ -67,6 +67,6 @@ class Experiment(object):
         dataSetFolder = torchvision.datasets.ImageFolder(root=directory, transform=transformations)##ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#torchvision.datasets.ImageFolder(root=directory, transform=transformations)#
         if train:
             trainingValidationDatasetSize = int(0.6 * len(dataSetFolder))
-            testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)
+            testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)//2
             return torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize, testDatasetSize])
         return dataSetFolder
