@@ -81,21 +81,21 @@ class ImageClassifier(object):
     def _run_epoch(self, split):
         self.model.train()        
         #if self.curr_epoch < 2:
-        transforms = [
-            torchvision.transforms.RandomHorizontalFlip(),
+        #transforms = [
+        #    torchvision.transforms.RandomHorizontalFlip(),
             #torchvision.transforms.RandomRotation()
             #    torchvision.transforms.ToPILImage(),
             #    torchvision.transforms.ToTensor()
-        ]
+        #]
             #if self.counter-1 > 0:
             #    transforms.insert(1, torchvision.transforms.Resize(self.resolution - 32*(self.counter-1)))
                 
             #for i in range(4-self.counter):
             #    if i < 2:
             #        transforms.insert(1, RandAugment())
-        transforms = torchvision.transforms.Compose(transforms)
+        #transforms = torchvision.transforms.Compose(transforms)
 
-        split[0] = list(map(lambda x: (torch.stack(list(map(lambda img: transforms(img), x[0]))),x[1]) ,list(split[0])))
+        #split[0] = list(map(lambda x: (torch.stack(list(map(lambda img: transforms(img), x[0]))),x[1]) ,list(split[0])))
         #if self.curr_epoch==2:
         #    split[0] = list(map(lambda x: (torchvision.transforms.functional.resize(x[0], self.resolution),x[1]) ,split[0]))
         #print(len(split[0]), print(split[0][0].size()))
@@ -117,9 +117,9 @@ class ImageClassifier(object):
             #self.optimizer.clipping = self.optimizer.clipping*2  if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 0.32
             #self.bs = self.bs//2 if self.bs>64 else 64
         idx = 0
-        for data in loader if train else enumerate(loader):
+        for data in enumerate(loader): #loader if train else 
             self.optimizer.zero_grad()
-            x, y = data if train else data[1]
+            x, y = data[1] #data if train else 
             if train:
                 """
                 x_, y_ = [], []
@@ -148,8 +148,8 @@ class ImageClassifier(object):
                 """
                 
                 #x = x.cuda()
-                #x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
-                #x = torch.stack(x)
+                x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
+                x = torch.stack(x)
                 shuffle_seed = torch.randperm(x.size(0))
                 x = x[shuffle_seed]
                 y = y[shuffle_seed]#torch.cat(y_, dim=0)
