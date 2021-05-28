@@ -28,6 +28,7 @@ class Experiment(object):
             if self.classifier.curr_epoch%config["save_interval"]==0:
                 self.classifier._save(config["save_directory"], "{}-{}".format(self.classifier.name, self.classifier.curr_epoch))
         print("Run Complete.")
+        self.classifier._test(loaders[2])
 
     def _preprocessing(self, directory, order_list, resolution, train):
         """
@@ -65,7 +66,7 @@ class Experiment(object):
         transformations = transforms.Compose(transformations)
         dataSetFolder = ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#torchvision.datasets.ImageFolder(root=directory, transform=transformations)#
         if train:
-            trainingValidationDatasetSize = int(0.7 * len(dataSetFolder))
+            trainingValidationDatasetSize = int(0.6 * len(dataSetFolder))
             testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)
-            return torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize])
+            return torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize, testDatasetSize])
         return dataSetFolder
