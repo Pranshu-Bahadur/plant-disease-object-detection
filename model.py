@@ -147,7 +147,7 @@ class ImageClassifier(object):
                 x_ = torch.cat(x_, dim=0)
                 """
                 if self.curr_epoch <= 2:
-                    x = torchvision.transforms.functional.resize(x, self.resolution - 64*(self.counter))
+                    x = torchvision.transforms.functional.resize(x, self.resolution - 32*(self.counter))
                 #x = x.cuda()
                 x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
                 x = torch.stack(x)
