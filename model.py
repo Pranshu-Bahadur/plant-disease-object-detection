@@ -15,7 +15,7 @@ import seaborn as sn
 import numpy as np
 import pandas as pd
 
-COUNT = 1
+
 
 class ImageClassifier(object):
     def __init__(self, config : dict):
@@ -36,6 +36,7 @@ class ImageClassifier(object):
         self.counter = 3
         self.final_epoch = config["epochs"]
         self.nc = config["num_classes"]
+        self.COUNT = 1
         print("Generated model: {}".format(self.name))
 
         if config["train"] and config["checkpoint"] == "":
@@ -232,9 +233,9 @@ class ImageClassifier(object):
             df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
             plt.figure(figsize=(5,5))
             cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
-            cfm_plot.figure.savefig('/home/fraulty/ws/content/kaggle_cfmtbx_{}_{}.png'.format("train" if train else "validation", 0 if train else COUNT))
+            cfm_plot.figure.savefig('/home/fraulty/ws/content/kaggle_cfmtbx_{}_{}.png'.format("train" if train else "validation", 0 if train else self.COUNT))
             if not train:
-                COUNT +=1
+                self.COUNT +=1
         
         return float(correct/float(total))*100, float(running_loss/iterations)
 
