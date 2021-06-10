@@ -15,7 +15,7 @@ import seaborn as sn
 import numpy as np
 import pandas as pd
 
-
+COUNT = 1
 
 class ImageClassifier(object):
     def __init__(self, config : dict):
@@ -194,7 +194,7 @@ class ImageClassifier(object):
                 idx += 1
 
             else:
-                """
+                
                 if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
                     inputs = x.to('cpu')
@@ -204,7 +204,7 @@ class ImageClassifier(object):
                     op = self.model(inputs)
                     _, p = torch.max(op, 1)
                     preds_cfm.append(p)
-                """
+                
                 #self.writer.add_graph(self.model.cuda(), x.cuda())
                 shuffle_seed = torch.randperm(x.size(0))
                 x = x[shuffle_seed]
@@ -220,7 +220,7 @@ class ImageClassifier(object):
             iterations += 1
             del x, y
             torch.cuda.empty_cache()
-        """
+        
         if self.curr_epoch==self.final_epoch-1:
             classes.pop()
             preds_cfm.pop()
@@ -232,8 +232,10 @@ class ImageClassifier(object):
             df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
             plt.figure(figsize=(5,5))
             cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
-            cfm_plot.figure.savefig('/home/fraulty/ws/content/cfmtbx_{}.png'.format("train" if train else "validation"))
-        """
+            cfm_plot.figure.savefig('/home/fraulty/ws/content/kaggle_cfmtbx_{}_{}.png'.format("train" if train else "validation", 0 if train else COUNT))
+            if not train:
+                COUNT +=1
+        
         return float(correct/float(total))*100, float(running_loss/iterations)
 
     def _test(self, loader):
