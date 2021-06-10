@@ -196,7 +196,7 @@ class ImageClassifier(object):
 
             else:
                 
-                if self.curr_epoch==self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
+                if self.curr_epoch>=self.final_epoch-1:# and x[y_.cpu()!=y.cpu()].size(0) > 0:
                     #CFM
                     inputs = x.to('cpu')
                     #inputs = torchvision.transforms.functional.adjust_contrast(inputs, 1.25)
