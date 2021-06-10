@@ -222,7 +222,7 @@ class ImageClassifier(object):
             del x, y
             torch.cuda.empty_cache()
         
-        if self.curr_epoch==self.final_epoch-1:
+        if self.curr_epoch>=self.final_epoch-1:
             classes.pop()
             preds_cfm.pop()
             classes = torch.stack(classes, dim=0).view(-1)
