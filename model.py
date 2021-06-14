@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import seaborn as sn
 import numpy as np
 import pandas as pd
+from sklearn.metrics import roc_auc_score
 
 
 
@@ -100,18 +101,19 @@ class ImageClassifier(object):
         #if self.curr_epoch==2:
         #    split[0] = list(map(lambda x: (torchvision.transforms.functional.resize(x[0], self.resolution),x[1]) ,split[0]))
         #print(len(split[0]), print(split[0][0].size()))
-        train_acc, train_loss = self._train_or_eval(split[0], True)
+        auc_train, train_acc, train_loss = self._train_or_eval(split[0], True)
         self.model.eval()
         with torch.no_grad():
-            val_acc, val_loss = self._train_or_eval(split[1], False)
-        print(train_acc, train_loss, val_acc, val_loss)
+            auc_val, val_acc, val_loss = self._train_or_eval(split[1], False)
+        print(auc_train, auc_val, train_acc, train_loss, val_acc, val_loss)
         self.curr_epoch += 1
-        return train_acc, train_loss, val_acc, val_loss
+        return auc_train, auc_val, train_acc, train_loss, val_acc, val_loss
 
     def _train_or_eval(self, loader, train):
         running_loss, correct, total, iterations = 0, 0, 0, 0
         classes = []
         preds_cfm = []
+        auc = 0
         if train: #and (self.curr_epoch+1)%5==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
@@ -191,6 +193,7 @@ class ImageClassifier(object):
                 probs = nn.functional.softmax(preds, 1)
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
+                auc += roc_auc_score(y.cpu(), y_.cpu())
                 print(idx, (correct/total)*100, loss.cpu().item())
                 idx += 1
 
@@ -217,6 +220,8 @@ class ImageClassifier(object):
                 probs = nn.functional.softmax(preds, 1)
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
+                auc += roc_auc_score(y.cpu(), y_.cpu())
+
             running_loss += loss.cpu().item()
             iterations += 1
             del x, y
@@ -237,14 +242,14 @@ class ImageClassifier(object):
             if not train:
                 self.COUNT +=1
         
-        return float(correct/float(total))*100, float(running_loss/iterations)
+        return float(auc/float(iterations))*100, float(correct/float(total))*100, float(running_loss/iterations)
 
     def _test(self, loader):
         self.model.eval()
         with torch.no_grad():
-            test_acc, test_loss = self._train_or_eval(loader, False)
-        print(test_acc, test_loss)
-        return test_acc, test_loss
+            auc_test, test_acc, test_loss = self._train_or_eval(loader, False)
+        print(auc_test, test_acc, test_loss)
+        return auc_test, test_acc, test_loss
 
     #@TODO
     def _add_detector(self):

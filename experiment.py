@@ -17,13 +17,15 @@ class Experiment(object):
         init_epoch = self.classifier.curr_epoch
         loaders = [Loader(ds, self.classifier.bs, shuffle=True, num_workers=4) for ds in split]
         while (self.classifier.curr_epoch < init_epoch + config["epochs"]):
-            train_acc, train_loss, val_acc, val_loss = self.classifier._run_epoch(loaders)
+            auc_train, auc_val, train_acc, train_loss, val_acc, val_loss = self.classifier._run_epoch(loaders)
 
-            print("Epoch: {} | Training Accuracy: {} | Training Loss: {} | Validation Accuracy: {} | Validation Loss: {}".format(self.classifier.curr_epoch, train_acc, train_loss, val_acc, val_loss))
+            print("Epoch: {} | Training Accuracy: {} | Training Loss: {} | Validation Accuracy: {} | Validation Loss: {} | AUC Train: {} | AUC Val: {}".format(self.classifier.curr_epoch, train_acc, train_loss, val_acc, val_loss, auc_train, auc_val))
             self.classifier.writer.add_scalar("Training Accuracy", train_acc, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("Validation Accuracy",val_acc, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("Training Loss",train_loss, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("Validation Loss",val_loss, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("AUC Train",auc_train, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("AUC Val",auc_val, self.classifier.curr_epoch)
 
             if self.classifier.curr_epoch%config["save_interval"]==0:
                 self.classifier._save(config["save_directory"], "{}-{}".format(self.classifier.name, self.classifier.curr_epoch))
