@@ -248,7 +248,7 @@ class ImageClassifier(object):
         self.model.eval()
         with torch.no_grad():
             auc_test, test_acc, test_loss = self._train_or_eval(loader, False)
-        print("Test:", auc_test, test_acc, test_loss)
+        print("Test metrics:", auc_test, test_acc, test_loss)
         return auc_test, test_acc, test_loss
 
     #@TODO
