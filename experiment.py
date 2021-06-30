@@ -17,20 +17,25 @@ class Experiment(object):
         init_epoch = self.classifier.curr_epoch
         loaders = [Loader(ds, self.classifier.bs, shuffle=True, num_workers=4) for ds in split]
         while (self.classifier.curr_epoch < init_epoch + config["epochs"]):
-            auc_train, auc_val, train_acc, train_loss, val_acc, val_loss = self.classifier._run_epoch(loaders)
-
-            print("Epoch: {} | Training Accuracy: {} | Training Loss: {} | Validation Accuracy: {} | Validation Loss: {} | AUC Train: {} | AUC Val: {}".format(self.classifier.curr_epoch, train_acc, train_loss, val_acc, val_loss, auc_train, auc_val))
+            auc_train, auc_val, f1_train, f1_val, recall_train, recall_val, precision_train, precision_val, train_acc, train_loss, val_acc, val_loss = self.classifier._run_epoch(loaders)
+            print("Epoch: {} | Training Accuracy: {} | Training Loss: {} | Validation Accuracy: {} | Validation Loss: {} | AUC Train: {} | AUC Val: {} | f1 Train: {} | f1 Val | recall Train: {} | recall Val | precision Train: {} | precision Val: {}: {}: {}".format(self.classifier.curr_epoch, train_acc, train_loss, val_acc, val_loss, auc_train, auc_val, f1_train, f1_val, recall_train, recall_val, precision_train, precision_val))
             self.classifier.writer.add_scalar("Training Accuracy", train_acc, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("Validation Accuracy",val_acc, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("Training Loss",train_loss, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("Validation Loss",val_loss, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("AUC Train",auc_train, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("AUC Val",auc_val, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("f1 Train",f1_train, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("f1 Val",f1_val, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("recall Train",recall_train, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("recall Val",recall_val, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("precision Train",precision_train, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("precision Val",precision_val, self.classifier.curr_epoch)
 
             if self.classifier.curr_epoch%config["save_interval"]==0:
                 self.classifier._save(config["save_directory"], "{}-{}".format(self.classifier.name, self.classifier.curr_epoch))
         print("Run Complete.")
-        self.classifier._test(loaders[2])
+        #self.classifier._test(loaders[2])
 
     def _preprocessing(self, directory, order_list, resolution, train):
         """
@@ -61,14 +66,14 @@ class Experiment(object):
             #RandAugment(),
             #RandAugment(),
             #RandAugment(),
-            transforms.Grayscale(3),
+            #transforms.Grayscale(3),
             transforms.ToTensor(),
             #transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
         transformations = transforms.Compose(transformations)
         dataSetFolder = torchvision.datasets.ImageFolder(root=directory, transform=transformations)##ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#torchvision.datasets.ImageFolder(root=directory, transform=transformations)#
         if train:
-            trainingValidationDatasetSize = int(0.6 * len(dataSetFolder))
-            testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)//2
-            return torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize, testDatasetSize])
+            trainingValidationDatasetSize = int(0.7 * len(dataSetFolder))
+            testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)
+            return torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize])
         return dataSetFolder

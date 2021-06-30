@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import seaborn as sn
 import numpy as np
 import pandas as pd
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, f1_score, precision_score, recall_score
 
 
 
@@ -101,19 +101,19 @@ class ImageClassifier(object):
         #if self.curr_epoch==2:
         #    split[0] = list(map(lambda x: (torchvision.transforms.functional.resize(x[0], self.resolution),x[1]) ,split[0]))
         #print(len(split[0]), print(split[0][0].size()))
-        auc_train, train_acc, train_loss = self._train_or_eval(split[0], True)
+        auc_train, f1_train, recall_train, precision_train, train_acc, train_loss = self._train_or_eval(split[0], True)
         self.model.eval()
         with torch.no_grad():
-            auc_val, val_acc, val_loss = self._train_or_eval(split[1], False)
-        print(auc_train, auc_val, train_acc, train_loss, val_acc, val_loss)
+            auc_val, f1_val, recall_val, precision_val,  val_acc, val_loss = self._train_or_eval(split[1], False)
+        print(auc_train, auc_val, f1_train, f1_val, recall_train, recall_val, precision_train, precision_val, train_acc, train_loss, val_acc, val_loss)
         self.curr_epoch += 1
-        return auc_train, auc_val, train_acc, train_loss, val_acc, val_loss
+        return auc_train, auc_val, f1_train, f1_val, recall_train, recall_val, precision_train, precision_val, train_acc, train_loss, val_acc, val_loss
 
     def _train_or_eval(self, loader, train):
         running_loss, correct, total, iterations = 0, 0, 0, 0
         classes = []
         preds_cfm = []
-        auc = 0
+        auc, f1, recall, precision = 0, 0, 0, 0
         if train: #and (self.curr_epoch+1)%5==0:
             self.counter = max(self.counter - 1, 0)
             print("Changing resolution...")
@@ -124,31 +124,6 @@ class ImageClassifier(object):
             self.optimizer.zero_grad()
             x, y = data[1] #data if train else 
             if train:
-                """
-                x_, y_ = [], []
-
-                for i in range(self.nc):
-                    if x[y==i].size(0) > 0:
-                        #if i==2:
-                            #for _ in range(2):
-                                #if self.counter > 0:
-                                #    x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
-                                #    y_.append(y[y==i])
-                                #else:
-                                #    x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.ToPILImage()(img), self.counter, i, idx)) for img in x[y==i]]))
-                                #    y_.append(y[y==i])
-                        
-                        #else:
-                        #for _ in ran ge(2):
-                        if self.counter > 0:
-                            x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.Resize(self.resolution - 32*self.counter,interpolation=PIL.Image.ANTIALIAS)(torchvision.transforms.ToPILImage()(img)), self.counter, i, idx)) for img in x[y==i]]))
-                            y_.append(y[y==i])
-                        else:
-                            x_.append(torch.stack([torchvision.transforms.ToTensor()(self.RA_Helper(torchvision.transforms.ToPILImage()(img), self.counter, i, idx)) for img in x[y==i]]))
-                            y_.append(y[y==i])
-                
-                x_ = torch.cat(x_, dim=0)
-                """
                 if self.curr_epoch <= 2:
                     x = torchvision.transforms.functional.resize(x, self.resolution - 32*(self.counter))
                 #x = x.cuda()
@@ -194,6 +169,9 @@ class ImageClassifier(object):
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 auc += roc_auc_score(y.cpu(), y_.cpu())
+                f1 += f1_score(y.cpu(), y_.cpu())
+                precision += precision_score(y.cpu(), y_.cpu())
+                recall += recall_score(y.cpu(), y_.cpu())
                 print(idx, (correct/total)*100, loss.cpu().item())
                 idx += 1
 
@@ -221,6 +199,9 @@ class ImageClassifier(object):
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 auc += roc_auc_score(y.cpu(), y_.cpu())
+                f1 += f1_score(y.cpu(), y_.cpu())
+                precision += precision_score(y.cpu(), y_.cpu())
+                recall += recall_score(y.cpu(), y_.cpu())
 
             running_loss += loss.cpu().item()
             iterations += 1
@@ -238,18 +219,18 @@ class ImageClassifier(object):
             df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
             plt.figure(figsize=(5,5))
             cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
-            cfm_plot.figure.savefig('/home/fraulty/ws/content/kaggle_cfmtbx_{}_{}.png'.format("train" if train else "validation", 0 if train else self.COUNT))
+            cfm_plot.figure.savefig('/home/fraulty/ws/content_1/pdp_cfmtbx_{}_{}.png'.format("train" if train else "validation", 0 if train else self.COUNT))
             if not train:
                 self.COUNT +=1
         
-        return float(auc/float(iterations))*100, float(correct/float(total))*100, float(running_loss/iterations)
+        return float(auc/float(iterations))*100, float(f1/float(iterations))*100, float(recall/float(iterations))*100, float(precision/float(iterations))*100, float(correct/float(total))*100, float(running_loss/iterations)
 
     def _test(self, loader):
         self.model.eval()
         with torch.no_grad():
-            auc_test, test_acc, test_loss = self._train_or_eval(loader, False)
-        print("Test metrics:", auc_test, test_acc, test_loss)
-        return auc_test, test_acc, test_loss
+            auc_test, f1, recall, precision, test_acc, test_loss = self._train_or_eval(loader, False)
+        print("Test metrics:", auc_test, f1, recall, precision, test_acc, test_loss)
+        return auc_test, f1, recall, precision, test_acc, test_loss
 
     #@TODO
     def _add_detector(self):
