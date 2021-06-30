@@ -169,9 +169,9 @@ class ImageClassifier(object):
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 auc += 0#roc_auc_score(y.cpu(), y_.cpu())
-                f1 += f1_score(y.cpu(), y_.cpu())
-                precision += precision_score(y.cpu(), y_.cpu())
-                recall += recall_score(y.cpu(), y_.cpu())
+                f1 += f1_score(y.cpu(), y_.cpu(), average='samples')
+                precision += precision_score(y.cpu(), y_.cpu(), average='samples')
+                recall += recall_score(y.cpu(), y_.cpu(), average='samples')
                 print(idx, (correct/total)*100, loss.cpu().item())
                 idx += 1
 
@@ -199,9 +199,9 @@ class ImageClassifier(object):
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
                 auc += 0#roc_auc_score(y.cpu(), y_.cpu())
-                f1 += f1_score(y.cpu(), y_.cpu())
-                precision += precision_score(y.cpu(), y_.cpu())
-                recall += recall_score(y.cpu(), y_.cpu())
+                f1 += f1_score(y.cpu(), y_.cpu(), average='samples')
+                precision += precision_score(y.cpu(), y_.cpu(), average='samples')
+                recall += recall_score(y.cpu(), y_.cpu(), average='samples')
 
             running_loss += loss.cpu().item()
             iterations += 1
