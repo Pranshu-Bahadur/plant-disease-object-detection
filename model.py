@@ -34,7 +34,7 @@ class ImageClassifier(object):
         self.writer = SummaryWriter(log_dir="logs/{}".format(self.name))
         self.writer.flush()
         self.resolution = config["resolution"]
-        self.counter = 3
+        self.counter = 4
         self.final_epoch = config["epochs"]
         self.nc = config["num_classes"]
         self.COUNT = 1
@@ -125,7 +125,7 @@ class ImageClassifier(object):
             x, y = data[1] #data if train else 
             if train:
                 if self.curr_epoch <= 2:
-                    x = torchvision.transforms.functional.resize(x, self.resolution - 32*(self.counter))
+                    x = torchvision.transforms.functional.resize(x, self.resolution - (32*(self.counter)))
                 #x = x.cuda()
                 x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
                 x = torch.stack(x)
