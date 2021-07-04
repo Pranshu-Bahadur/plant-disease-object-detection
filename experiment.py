@@ -36,7 +36,7 @@ class Experiment(object):
             if self.classifier.curr_epoch%config["save_interval"]==0:
                 self.classifier._save(config["save_directory"], "{}-{}".format(self.classifier.name, self.classifier.curr_epoch))
         print("Run Complete.")
-        self.classifier._test(loaders[2])
+        #self.classifier._test(loaders[2])
 
     def _preprocessing(self, directory, order_list, resolution, train):
         """
@@ -72,10 +72,12 @@ class Experiment(object):
             #transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
         transformations = transforms.Compose(transformations)
-        dataSetFolder = torchvision.datasets.ImageFolder(root=directory, transform=transformations)##ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#torchvision.datasets.ImageFolder(root=directory, transform=transformations)#
+        dataSetFolder = ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#torchvision.datasets.ImageFolder(root=directory, transform=transformations)#
         if train:
-            trainingValidationDatasetSize = int(0.6 * len(dataSetFolder))
-            testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)//2
+            trainingValidationDatasetSize = int(0.7 * len(dataSetFolder))
+            testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)
+
+            """
             weights = np.array([1/len(dataSetFolder) for _ in range(len(dataSetFolder))])
             splits = []
             sizes = [trainingValidationDatasetSize, testDatasetSize, testDatasetSize]
@@ -85,12 +87,14 @@ class Experiment(object):
                 indices = np.concatenate((indices,list(torch.utils.data.WeightedRandomSampler(np.concatenate((weights[len(dataSetFolder)//2:-1], [0 for _ in range(len(weights)//2)]),axis=0),sizes[i]//2, replacement=False))), axis=0)
                 splits.append(torch.utils.data.Subset(dataSetFolder,indices))
                 weights[indices] = 0
-
-            #splits = #torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize, testDatasetSize])
-            split_names = ['train', 'validation', 'test']
+            """
+            splits = torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize])
+            """
+            split_names = ['train', 'validation']
             classes = list(dataSetFolder.class_to_idx.items())
             print(classes)
             distributions = {split_names[i]: {k: len(list(filter(lambda x: x[1]==v, splits[i]))) for k,v in classes} for i in range(len(splits))}
             print(distributions)
+            """
             return splits
         return dataSetFolder
