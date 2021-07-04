@@ -80,7 +80,7 @@ class Experiment(object):
             sizes = [trainingValidationDatasetSize, testDatasetSize, testDatasetSize]
             indices = []
             for i in range(3):
-                indices =  torch.utils.data.WeightedRandomSampler(weights, sizes[i],replacement=False)
+                indices = torch.utils.data.WeightedRandomSampler(weights, sizes[i],replacement=False)
                 splits.append(torch.utils.data.Subset(dataSetFolder,indices))
                 weights[indices] = 0
 
