@@ -27,6 +27,7 @@ def _model_config(args):
         "library": args.library,
         "save_directory": args.save_directory,
         "list": args.list,
+        "test": args.test if args.test else ""
         
     }
     return config
@@ -74,6 +75,7 @@ if __name__ == "__main__":
     parser.add_argument("--pretrained", action="store_true")
     parser.add_argument("--opMode", action="store_true")
     parser.add_argument("--ra_grid", action="store_true")
+    parser.add_argument("--test")
 
 
     args = parser.parse_args()

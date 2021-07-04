@@ -11,6 +11,7 @@ from util import ImageFilelistWithLabels, collate_fn
 class Experiment(object):
     def __init__(self, config: dict):
         self.classifier = ImageClassifier(config)
+        self.test = config["test"]
         
     #@TODO Add normalized weight computation, use weighted random sampler.
     def _run(self, dataset, config: dict):
@@ -36,7 +37,7 @@ class Experiment(object):
             if self.classifier.curr_epoch%config["save_interval"]==0:
                 self.classifier._save(config["save_directory"], "{}-{}".format(self.classifier.name, self.classifier.curr_epoch))
         print("Run Complete.")
-        #self.classifier._test(loaders[2])
+        self.classifier._test(loaders[2])
 
     def _preprocessing(self, directory, order_list, resolution, train):
         """
@@ -72,12 +73,12 @@ class Experiment(object):
             #transforms.Normalize(mean=mean_sum, std=std_sum)
         ]
         transformations = transforms.Compose(transformations)
-        dataSetFolder = ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#torchvision.datasets.ImageFolder(root=directory, transform=transformations)#
+        dataSetFolder = torchvision.datasets.ImageFolder(root=directory, transform=transformations)#ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)##
         if train:
             trainingValidationDatasetSize = int(0.7 * len(dataSetFolder))
             testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)
-
             """
+            
             weights = np.array([1/len(dataSetFolder) for _ in range(len(dataSetFolder))])
             splits = []
             sizes = [trainingValidationDatasetSize, testDatasetSize, testDatasetSize]
@@ -88,13 +89,13 @@ class Experiment(object):
                 splits.append(torch.utils.data.Subset(dataSetFolder,indices))
                 weights[indices] = 0
             """
+            
             splits = torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize])
-            """
-            split_names = ['train', 'validation']
+            splits.append(torchvision.datasets.ImageFolder(root=self.test, transform=transformations))
+            split_names = ['train', 'validation', 'test']
             classes = list(dataSetFolder.class_to_idx.items())
             print(classes)
             distributions = {split_names[i]: {k: len(list(filter(lambda x: x[1]==v, splits[i]))) for k,v in classes} for i in range(len(splits))}
             print(distributions)
-            """
             return splits
         return dataSetFolder
