@@ -75,7 +75,16 @@ class Experiment(object):
         if train:
             trainingValidationDatasetSize = int(0.6 * len(dataSetFolder))
             testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)//2
-            splits = torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize, testDatasetSize])
+            weights = [0.5 for _ in range(len(dataSetFolder))]
+            splits = []
+            sizes = [trainingValidationDatasetSize, testDatasetSize, testDatasetSize]
+            indices = []
+            for i in range(3):
+                indices =  torch.utils.data.WeightedRandomSampler(weights, sizes[i],replacement=False)
+                splits.append(torch.utils.data.Subset(dataSetFolder,indices))
+                weights[indices] = 0
+
+            #splits = #torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize, testDatasetSize])
             split_names = ['train', 'validation', 'test']
             classes = list(dataSetFolder.class_to_idx.items())
             print(classes)
