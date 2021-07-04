@@ -126,7 +126,7 @@ class ImageClassifier(object):
             if train:
                 if self.curr_epoch <= 2:
                     x = torchvision.transforms.functional.resize(x, self.resolution - (32*(self.counter)))
-                #x = x.cuda()
+                x = x.cuda()
                 x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
                 x = torch.stack(x)
                 shuffle_seed = torch.randperm(x.size(0))
@@ -168,7 +168,7 @@ class ImageClassifier(object):
                 probs = nn.functional.softmax(preds, 1)
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
-                auc += 0#roc_auc_score(y.cpu(), y_.cpu())
+                auc += roc_auc_score(y.cpu(), y_.cpu())
                 f1 += f1_score(y.cpu(), y_.cpu(), average='micro')
                 precision += precision_score(y.cpu(), y_.cpu(), average='micro')
                 recall += recall_score(y.cpu(), y_.cpu(), average='micro')
@@ -198,7 +198,7 @@ class ImageClassifier(object):
                 probs = nn.functional.softmax(preds, 1)
                 y_ = torch.argmax(probs, dim=1)
                 correct += (y_.cpu()==y.cpu()).sum().item()
-                auc += 0#roc_auc_score(y.cpu(), y_.cpu())
+                auc += roc_auc_score(y.cpu(), y_.cpu())
                 f1 += f1_score(y.cpu(), y_.cpu(), average='micro')
                 precision += precision_score(y.cpu(), y_.cpu(), average='micro')
                 recall += recall_score(y.cpu(), y_.cpu(), average='micro')
@@ -209,20 +209,19 @@ class ImageClassifier(object):
             torch.cuda.empty_cache()
         
         if self.curr_epoch>=self.final_epoch-1:
-            classes.pop()
-            preds_cfm.pop()
+            c_l = classes.pop()
+            p_l = preds_cfm.pop()
             classes = torch.stack(classes, dim=0).view(-1)
             preds_cfm = torch.stack(preds_cfm, dim=0).view(-1)
-            #print(classes.size(), preds.size())
             cfm = confusion_matrix(classes.cpu().detach().numpy(),preds_cfm.cpu().detach().numpy())
+            cfm += confusion_matrix(c_l.cpu().detach().numpy(),p_l.cpu().detach().numpy())
             classes=[str(i) for i in range(self.nc)]
             df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
             plt.figure(figsize=(5,5))
             cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
-            cfm_plot.figure.savefig('/home/fraulty/ws/content_1/pdp_cfmtbx_{}_{}.png'.format("train" if train else "validation", 0 if train else self.COUNT))
+            cfm_plot.figure.savefig('/home/fraulty/ws/content_1/kaggle_tb_cfmtbx_{}_{}.png'.format("train" if train else "validation", 0 if train else self.COUNT))
             if not train:
                 self.COUNT +=1
-        
         return float(auc/float(iterations))*100, float(f1/float(iterations))*100, float(recall/float(iterations))*100, float(precision/float(iterations))*100, float(correct/float(total))*100, float(running_loss/iterations)
 
     def _test(self, loader):

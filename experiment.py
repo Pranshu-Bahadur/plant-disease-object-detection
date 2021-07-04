@@ -23,8 +23,8 @@ class Experiment(object):
             self.classifier.writer.add_scalar("Validation Accuracy",val_acc, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("Training Loss",train_loss, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("Validation Loss",val_loss, self.classifier.curr_epoch)
-            #self.classifier.writer.add_scalar("AUC Train",auc_train, self.classifier.curr_epoch)
-            #self.classifier.writer.add_scalar("AUC Val",auc_val, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("AUC Train",auc_train, self.classifier.curr_epoch)
+            self.classifier.writer.add_scalar("AUC Val",auc_val, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("f1 Train",f1_train, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("f1 Val",f1_val, self.classifier.curr_epoch)
             self.classifier.writer.add_scalar("recall Train",recall_train, self.classifier.curr_epoch)
@@ -35,7 +35,7 @@ class Experiment(object):
             if self.classifier.curr_epoch%config["save_interval"]==0:
                 self.classifier._save(config["save_directory"], "{}-{}".format(self.classifier.name, self.classifier.curr_epoch))
         print("Run Complete.")
-        #self.classifier._test(loaders[2])
+        self.classifier._test(loaders[2])
 
     def _preprocessing(self, directory, order_list, resolution, train):
         """
@@ -73,7 +73,11 @@ class Experiment(object):
         transformations = transforms.Compose(transformations)
         dataSetFolder = torchvision.datasets.ImageFolder(root=directory, transform=transformations)##ImageFilelistWithLabels(root=directory, flist=order_list, transform=transformations)#torchvision.datasets.ImageFolder(root=directory, transform=transformations)#
         if train:
-            trainingValidationDatasetSize = int(0.7 * len(dataSetFolder))
-            testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)
-            return torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize])
+            trainingValidationDatasetSize = int(0.6 * len(dataSetFolder))
+            testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)//2
+            splits = torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize, testDatasetSize])
+            split_names = ['train', 'validation', 'test']
+            distributions = {split_names[i]: {k: len(list(filter(lambda x: x[1]==v, splits[i].imgs))) for k,v in splits[i].classes.items()} for i in range(len(splits))}
+            print(distributions)
+            return splits
         return dataSetFolder
