@@ -1,3 +1,4 @@
+import numpy as np
 from model import ImageClassifier
 import torchvision
 from torchvision import transforms as transforms
@@ -75,7 +76,7 @@ class Experiment(object):
         if train:
             trainingValidationDatasetSize = int(0.6 * len(dataSetFolder))
             testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)//2
-            weights = [1/len(dataSetFolder) for _ in range(len(dataSetFolder))]
+            weights = np.array([1/len(dataSetFolder) for _ in range(len(dataSetFolder))])
             splits = []
             sizes = [trainingValidationDatasetSize, testDatasetSize, testDatasetSize]
             indices = []
