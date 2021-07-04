@@ -77,7 +77,7 @@ class Experiment(object):
             testDatasetSize = int(len(dataSetFolder) - trainingValidationDatasetSize)//2
             splits = torch.utils.data.random_split(dataSetFolder, [trainingValidationDatasetSize, testDatasetSize, testDatasetSize])
             split_names = ['train', 'validation', 'test']
-            classes = dataSetFolder.classes
+            classes = dataSetFolder.classes.items()
             distributions = {split_names[i]: {k: len(list(filter(lambda x: x[1]==v, splits[i]))) for k,v in classes} for i in range(len(splits))}
             print(distributions)
             return splits
