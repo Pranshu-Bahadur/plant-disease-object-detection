@@ -81,8 +81,8 @@ class Experiment(object):
             sizes = [trainingValidationDatasetSize, testDatasetSize, testDatasetSize]
             indices = []
             for i in range(3):
-                indices = list(torch.utils.data.WeightedRandomSampler(np.concatenate(([0 for _ in range(len(weights)//2)], weights[:len(dataSetFolder)//2 -1]),axis=0),sizes[i]//2, replacement=False))
-                indices = np.concatenate((indices,list(torch.utils.data.WeightedRandomSampler(np.concatenate((weights[:len(dataSetFolder)//2 -1], [0 for _ in range(len(weights)//2)]),axis=0),sizes[i]//2, replacement=False))), axis=0)
+                indices = list(torch.utils.data.WeightedRandomSampler(np.concatenate(([0 for _ in range(len(weights)//2)], weights[:len(dataSetFolder)//2]),axis=0),sizes[i]//2, replacement=False))
+                indices = np.concatenate((indices,list(torch.utils.data.WeightedRandomSampler(np.concatenate((weights[len(dataSetFolder)//2:-1], [0 for _ in range(len(weights)//2)]),axis=0),sizes[i]//2, replacement=False))), axis=0)
                 splits.append(torch.utils.data.Subset(dataSetFolder,indices))
                 weights[indices] = 0
 
