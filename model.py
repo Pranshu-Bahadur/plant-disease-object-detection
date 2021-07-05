@@ -53,7 +53,8 @@ class ImageClassifier(object):
     def _create_optimizer(self, name, model_params, lr):
         optim_dict = {"SGD":torch.optim.SGD(model_params.parameters(), lr,weight_decay=1e-5, momentum=0.9, nesterov=True),
                       "SAMSGD": SAMSGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5),
-                      "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=1e-05, nesterov=True, momentum=0.9)#AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=2e-05, nesterov=True, momentum=0.9) #,###
+                      "SGDAGC": SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=1e-05, nesterov=True, momentum=0.9),#AGC(model_params.parameters(), torch.optim.SGD(model_params.parameters(), lr, momentum=0.9,weight_decay=1e-5, nesterov=True), model=model_params, ignore_agc=['head'], clipping=0.01)#SGD_AGC(model_params.parameters(), lr=lr, clipping=0.01, weight_decay=2e-05, nesterov=True, momentum=0.9) #,###
+                      "ADAM": torch.optim.Adam(model_params.parameters(), lr, betas=(0.9, 0.999))
         }
         return optim_dict[name]
     
@@ -114,9 +115,9 @@ class ImageClassifier(object):
         classes = []
         preds_cfm = []
         auc, f1, recall, precision = 0, 0, 0, 0
-        if train: #and (self.curr_epoch+1)%5==0:
-            self.counter = max(self.counter - 1, 0)
-            print("Changing resolution...")
+        #if train: #and (self.curr_epoch+1)%5==0:
+        #    self.counter = max(self.counter - 1, 0)
+        #    print("Changing resolution...")
             #self.optimizer.clipping = self.optimizer.clipping*2  if self.bs>128 or self.curr_epoch==self.final_epoch-2 else 0.32
             #self.bs = self.bs//2 if self.bs>64 else 64
         idx = 0
@@ -124,10 +125,10 @@ class ImageClassifier(object):
             self.optimizer.zero_grad()
             x, y = data[1] #data if train else 
             if train:
-                if self.curr_epoch <= 2:
-                    x = torchvision.transforms.functional.resize(x, self.resolution - (32*(self.counter)))
+                #if self.curr_epoch <= 2:
+                #    x = torchvision.transforms.functional.resize(x, self.resolution - (32*(self.counter)))
                 x = x.cuda()
-                x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
+                #x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
                 x = torch.stack(x)
                 shuffle_seed = torch.randperm(x.size(0))
                 x = x[shuffle_seed]
