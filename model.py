@@ -129,7 +129,7 @@ class ImageClassifier(object):
                 #    x = torchvision.transforms.functional.resize(x, self.resolution - (32*(self.counter)))
                 x = x.cuda()
                 #x = list(map(lambda img: torchvision.transforms.functional.to_tensor(self.RA_Helper(torchvision.transforms.functional.to_pil_image(img), self.counter, 0, idx)), x))
-                x = torch.stack(x)
+                #x = torch.stack(x)
                 shuffle_seed = torch.randperm(x.size(0))
                 x = x[shuffle_seed]
                 y = y[shuffle_seed]#torch.cat(y_, dim=0)
@@ -220,7 +220,7 @@ class ImageClassifier(object):
             df_cfm=pd.DataFrame(cfm.astype(int), index=classes, columns=classes)
             plt.figure(figsize=(5,5))
             cfm_plot=sn.heatmap(df_cfm.astype(int), annot=True, fmt=".1f")
-            cfm_plot.figure.savefig('/home/fraulty/ws/content_1/kaggle_tb_cfmtbx_{}_{}.png'.format("train" if train else "validation", 0 if train else self.COUNT))
+            cfm_plot.figure.savefig('/home/fraulty/ws/content_1/pdp_tb_cfmtbx_{}_{}.png'.format("train" if train else "validation", 0 if train else self.COUNT))
             if not train:
                 self.COUNT +=1
         return float(auc/float(iterations))*100, float(f1/float(iterations))*100, float(recall/float(iterations))*100, float(precision/float(iterations))*100, float(correct/float(total))*100, float(running_loss/iterations)
