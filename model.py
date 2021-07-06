@@ -208,7 +208,7 @@ class ImageClassifier(object):
             iterations += 1
             del x, y
             torch.cuda.empty_cache()
-        
+        """
         if self.curr_epoch>=self.final_epoch-1:
             c_l = classes.pop()
             p_l = preds_cfm.pop()
@@ -223,6 +223,7 @@ class ImageClassifier(object):
             cfm_plot.figure.savefig('/home/fraulty/ws/content_1/pdp_tb_cfmtbx_{}_{}.png'.format("train" if train else "validation", 0 if train else self.COUNT))
             if not train:
                 self.COUNT +=1
+        """
         return float(auc/float(iterations))*100, float(f1/float(iterations))*100, float(recall/float(iterations))*100, float(precision/float(iterations))*100, float(correct/float(total))*100, float(running_loss/iterations)
 
     def _test(self, loader):
