@@ -1,4 +1,4 @@
-# Plant disease Object-detection
+# Pytorch Image classification pipeline:
 
 libraries installation:
 - pytorch 1.8
